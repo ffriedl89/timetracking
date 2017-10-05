@@ -7,8 +7,13 @@
 </template>
 
 <script>
+import Btn from './atoms/btn/Btn';
+
 export default {
   name: 'app-header',
+  components: {
+    Btn,
+  },
 };
 </script>
 

@@ -4,28 +4,42 @@
       v-bind:key="index"
       v-bind:day="day"
     >
+      <timeline slot="timeline" :showLabels="index === 0"/>
     </day>
   </div>
 </template>
 
 <script>
 import Day from './Day';
+import Timeline from './Timeline';
 
 export default {
   name: 'week',
-  props: ['weekdays'],
+  props: {
+    weekdays: {
+      type: Array,
+      required: true,
+    },
+  },
   components: {
     Day,
+    Timeline,
+  },
+  methods: {
+    last(index, arr) {
+      return index === arr.lenght - 1;
+    },
   },
 };
 </script>
 
-<<style lang="postcss" scoped>
+<style lang="scss" scoped>
+@import '../scss/variables';
+
 .week {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  padding: 1rem;
-  grid-gap: 0.5rem;
+  box-shadow: $shadow;
 }
 </style>
 

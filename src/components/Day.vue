@@ -1,8 +1,8 @@
 <template>
   <div class="day">
-    <header class="day_header">{{day | moment("dddd, MMM Do YYYY")}}</header>
+    <header class="day__header">{{day | moment("dddd, MMM Do YYYY")}}</header>
     <div class="day__content">
-      <
+      <slot name="timeline" />
     </div>
   </div>
 </template>
@@ -10,26 +10,34 @@
 <script>
 export default {
   name: 'day',
-  props: ['day'],
+  props: {
+    day: {
+      type: Object,
+      required: true,
+    },
+  },
+  components: {},
 };
 </script>
 
-<<style lang="postcss" scoped>
+<style lang="scss" scoped>
+@import '../scss/variables';
+
 .day {
-  border: 1px solid #D8E1DE;
-  border-top: 5px solid #4fac27;
-  padding: 1rem 0.5rem;
+  border-top: 5px solid $green;
   min-height: 20vh;
+  display: grid;
+}
+
+.day:not(:last-child) {
+  border-right: 1px solid $gray-dark;
 }
 
 .day__header {
-
+  background-color: $gray-light;
+  border-bottom: 1px solid $green;
+  padding: 1rem 0.5rem;
 }
-
-.day__content {
-
-}
-
 </style>
 
 
