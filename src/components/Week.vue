@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     last(index, arr) {
-      return index === arr.lenght - 1;
+      return index === arr.length - 1;
     },
   },
 };

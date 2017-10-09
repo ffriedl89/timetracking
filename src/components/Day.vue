@@ -27,6 +27,7 @@ export default {
   border-top: 5px solid $green;
   min-height: 20vh;
   display: grid;
+  grid-template-rows: 80px 1fr;
 }
 
 .day:not(:last-child) {
