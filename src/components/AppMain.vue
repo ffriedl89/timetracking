@@ -42,7 +42,7 @@ export default {
       }
 
       const weekdays = [];
-      for (let i = 0; i < 7; i += 1) {
+      for (let i = 0; i < this.daysPerWeek; i += 1) {
         weekdays.push(initialWeekday.clone().add(i, 'days'));
       }
       return weekdays;
