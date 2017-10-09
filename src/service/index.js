@@ -15,21 +15,21 @@ class Service {
     this.providers = {
       google: new auth.GoogleAuthProvider(),
     };
-  }
 
-  getUsername() {
-    return this.username;
-  }
-
-  getLoggedIn() {
-    return this.user !== undefined;
+    // tracked data
+    this.loggedIn = false;
+    this.user = {};
+    this.username = '';
   }
 
   login() {
-    auth()
+    return auth()
       .signInWithPopup(this.providers.google)
       .then((data) => {
+        console.log(data, this);
         this.user = data.user;
+        this.username = this.user.name;
+        this.loggedIn = true;
         this.credentials = data.credentials;
       });
   }
