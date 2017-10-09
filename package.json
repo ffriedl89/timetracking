@@ -16,6 +16,7 @@
     "styleguide:build": "vue-styleguidist build"
   },
   "dependencies": {
+    "firebase": "^4.5.0",
     "moment": "^2.18.1",
     "pretty-format": "^21.2.1",
     "vue": "^2.4.4",
