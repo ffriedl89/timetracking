@@ -1,4 +1,5 @@
 import { initializeApp, auth } from 'firebase';
+import store from '../store';
 
 const SETTINGS = {
   apiKey: 'AIzaSyAPMWLjeu2PkjCimTSJeHUoudfCsY7XAJg',
@@ -26,11 +27,7 @@ class Service {
     return auth()
       .signInWithPopup(this.providers.google)
       .then((data) => {
-        console.log(data, this);
-        this.user = data.user;
-        this.username = this.user.name;
-        this.loggedIn = true;
-        this.credentials = data.credentials;
+        store.dispatch('login', data);
       });
   }
 }

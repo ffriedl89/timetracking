@@ -4,16 +4,30 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import Service from '../../../service';
 
 export default {
-  data: Service,
-  computed: {},
+  ...mapGetters([
+    'user',
+    'username',
+  ]),
+  computed: {
+    loggedIn() {
+      if (this.user) {
+        console.log('loggedin', this.user, this.user.newProp);
+      }
+      return this.user !== undefined;
+    },
+    username() {
+      console.log('username', this.username);
+      if (!this.username) return '';
+      return this.username || '';
+    },
+  },
   methods: {
     login() {
-      console.log(this.loggedIn);
-      Service.login()
-        .then(() => console.log(this.loggedIn));
+      Service.login();
     },
   },
 };
