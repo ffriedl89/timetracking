@@ -5,6 +5,7 @@ import vueMoment from 'vue-moment';
 import App from './App';
 import Btn from './components/atoms/btn/Btn';
 import router from './router';
+import store from './store';
 
 Vue.config.productionTip = false;
 Vue.use(vueMoment);
@@ -13,6 +14,7 @@ Vue.use(vueMoment);
 new Vue({
   el: '#app',
   router,
+  store,
   template: '<App/>',
   components: {
     App,

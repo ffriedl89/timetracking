@@ -1,6 +1,6 @@
 <template>
   <div class="timeline" :style="styleObject">
-    <div class="timeline-entry" v-for="(time, index) in slots" v-bind:key="index" :class="{ 'timeline-entry--fullhour': isFullHour(time) }">
+    <div class="timeline-entry" v-for="(time, index) in slots" v-bind:key="index" :class="{ 'timeline-entry--fullhour': isFullHour(time) }" v-on:click="onClick(time)">
       <div class="timeline-entry__label" v-if="showLabels && isFullHour(time)">
         {{time | moment('HH:mm')}}
       </div>
@@ -65,6 +65,9 @@ export default {
   methods: {
     isFullHour(mom) {
       return mom.minute() === 0;
+    },
+    onClick(start) {
+      this.$emit('timelineclick', start);
     },
   },
 };

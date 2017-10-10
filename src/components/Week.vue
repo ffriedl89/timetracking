@@ -3,15 +3,14 @@
     <day v-for="(day, index) in weekdays"
       v-bind:key="index"
       v-bind:day="day"
+      :showLabels="index === 0"
     >
-      <timeline slot="timeline" :showLabels="index === 0"/>
     </day>
   </div>
 </template>
 
 <script>
 import Day from './Day';
-import Timeline from './Timeline';
 
 export default {
   name: 'week',
@@ -23,7 +22,6 @@ export default {
   },
   components: {
     Day,
-    Timeline,
   },
   methods: {
     last(index, arr) {
