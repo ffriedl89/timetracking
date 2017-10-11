@@ -8,6 +8,11 @@ const state = {
 // getters
 const getters = {
   entries: s => s.entries,
+  entriesForDay: s => day => s.entries.filter(e =>
+    e.start.date() === day.date()
+    && e.start.month() === day.month()
+    && e.start.year() === day.year(),
+  ),
 };
 
 // actions
