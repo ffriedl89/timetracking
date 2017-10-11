@@ -4,7 +4,7 @@ import * as types from '../mutation-types';
 // intial state
 const state = {
   user: {},
-  username: '',
+  username: undefined,
 };
 
 // getters
@@ -28,10 +28,7 @@ const actions = {
 // mutations
 const mutations = {
   [types.LOGIN](s, { user }) {
-    Vue.set(s, 'user', true);
     Vue.set(s, 'username', user.user.displayName);
-    console.log(s);
-    return s;
   },
 };
 

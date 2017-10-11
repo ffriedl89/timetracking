@@ -1,6 +1,9 @@
 <template>
-  <button v-if="loggedIn">Hello {{username}}</button>
-  <button v-else v-on:click="login">Login</button>
+  <div>
+    <button v-if="loggedIn">Hello {{username}}</button>
+    <button v-else v-on:click="login">Login</button>
+    <button v-on:click="checkLoggedin">aaa</button>
+  </div>
 </template>
 
 <script>
@@ -9,25 +12,22 @@ import Service from '../../../service';
 
 export default {
   ...mapGetters([
-    'user',
     'username',
   ]),
   computed: {
     loggedIn() {
-      if (this.user) {
-        console.log('loggedin', this.user, this.user.newProp);
-      }
-      return this.user !== undefined;
-    },
-    username() {
-      console.log('username', this.username);
-      if (!this.username) return '';
-      return this.username || '';
+      console.log(this.username);
+      return this.username !== undefined;
     },
   },
   methods: {
     login() {
       Service.login();
+    },
+    checkLoggedin() {
+      console.log(this.username);
+      console.log(this.$store.state.user.username);
+      debugger;
     },
   },
 };
