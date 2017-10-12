@@ -1,8 +1,7 @@
 <template>
   <div>
-    <button v-if="loggedIn">Hello {{username}}</button>
+    <button v-if="loggedIn" v-on:click="logout">Logout {{username}}</button>
     <button v-else v-on:click="login">Login</button>
-    <button v-on:click="checkLoggedin">aaa</button>
   </div>
 </template>
 
@@ -11,23 +10,24 @@ import { mapGetters } from 'vuex';
 import Service from '../../../service';
 
 export default {
-  ...mapGetters([
-    'username',
-  ]),
   computed: {
+    ...mapGetters([
+      'user',
+    ]),
     loggedIn() {
-      console.log(this.username);
-      return this.username !== undefined;
+      return this.user !== undefined;
+    },
+    username() {
+      return this.loggedIn ? this.user.displayName : '';
     },
   },
   methods: {
     login() {
       Service.login();
     },
-    checkLoggedin() {
-      console.log(this.username);
-      console.log(this.$store.state.user.username);
-      debugger;
+    logout() {
+      console.log(Service);
+      Service.logout();
     },
   },
 };

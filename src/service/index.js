@@ -17,18 +17,21 @@ class Service {
       google: new auth.GoogleAuthProvider(),
     };
 
-    // tracked data
-    this.loggedIn = false;
-    this.user = {};
-    this.username = '';
+    auth().onAuthStateChanged((user) => {
+      if (user) {
+        store.dispatch('login', user);
+      } else {
+        store.dispatch('logout');
+      }
+    });
   }
 
   login() {
-    return auth()
-      .signInWithPopup(this.providers.google)
-      .then((data) => {
-        store.dispatch('login', data);
-      });
+    return auth().signInWithPopup(this.providers.google);
+  }
+
+  logout() {  // eslint-disable-line
+    return auth().signOut();
   }
 }
 

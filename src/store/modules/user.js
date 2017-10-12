@@ -3,22 +3,18 @@ import * as types from '../mutation-types';
 
 // intial state
 const state = {
-  user: {},
-  username: undefined,
+  user: undefined,
 };
 
 // getters
 const getters = {
   user: s => s.user,
-  username: s => s.username,
 };
 
 // actions
 const actions = {
   login({ commit }, user) {
-    commit(types.LOGIN, {
-      user,
-    });
+    commit(types.LOGIN, user);
   },
   logout({ commit }) {
     commit(types.LOGOUT);
@@ -27,8 +23,11 @@ const actions = {
 
 // mutations
 const mutations = {
-  [types.LOGIN](s, { user }) {
-    Vue.set(s, 'username', user.user.displayName);
+  [types.LOGIN](s, user) {
+    Vue.set(s, 'user', user);
+  },
+  [types.LOGOUT](s) {
+    Vue.set(s, 'user', undefined);
   },
 };
 
