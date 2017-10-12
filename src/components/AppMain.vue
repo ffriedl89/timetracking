@@ -34,12 +34,7 @@ export default {
   computed: {
     currentWeek() {
       const initialWeekday = moment().startOf('isoweek');
-      if (this.weekOffset > 0) {
-        initialWeekday.add(this.weekOffset, 'weeks');
-      }
-      if (this.weekOffset < 0) {
-        initialWeekday.subtract(this.weekOffset, 'weeks');
-      }
+      initialWeekday.add(this.weekOffset, 'weeks');
 
       const weekdays = [];
       for (let i = 0; i < this.daysPerWeek; i += 1) {
