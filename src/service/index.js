@@ -1,4 +1,4 @@
-import { initializeApp, auth } from 'firebase';
+import { initializeApp, auth, database } from 'firebase';
 import store from '../store';
 
 const SETTINGS = {
@@ -20,6 +20,8 @@ class Service {
     auth().onAuthStateChanged((user) => {
       if (user) {
         store.dispatch('login', user);
+        this.userKey = user.uid;
+        this.dbRef = database().ref(this.userKey);
       } else {
         store.dispatch('logout');
       }
@@ -32,6 +34,40 @@ class Service {
 
   logout() {  // eslint-disable-line
     return auth().signOut();
+  }
+
+  serializeEntry(entry) { //eslint-disable-line
+    return {
+      ...entry,
+      start: entry.start.toISOString(),
+      end: entry.end.toISOString(),
+    };
+  }
+  /**
+   * Adds a timeentry to the user spaced database in firebase
+   * @param {timeentry} entry
+   */
+  addEntry(entry) {
+    const entryKey = this.dbRef.child('entries').push().key;
+    const payload = {
+      ...entry,
+      key: entryKey,
+    };
+    const updates = {};
+    updates[`entries/${entryKey}`] = this.serializeEntry(payload);
+    return this.dbRef.update(updates)
+      .then(() => payload);
+  }
+
+  /**
+   * Removes an entry from the database
+   */
+  removeEntry(key) {
+    return this.dbRef.child(`entries/${key}`).remove();
+  }
+
+  loadEntriesForDay(day) {
+
   }
 }
 

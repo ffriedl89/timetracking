@@ -1,4 +1,5 @@
 import * as types from '../mutation-types';
+import Service from '../../service';
 
 // initial state
 const state = {
@@ -17,10 +18,15 @@ const getters = {
 
 // actions
 const actions = {
+  populateEntries({ commit }, entries) {
+    commit(types.POPULATE_ENTRIES, entries);
+  },
+
   addEntry({ commit }, entry) {
-    commit(types.ADD_ENTRY, {
-      entry,
-    });
+    Service.addEntry(entry)
+      .then((dbEntry) => {
+        commit(types.ADD_ENTRY, dbEntry);
+      });
   },
   removeEntry({ commit }, id) {
     commit(types.REMOVE_ENTRY, {
@@ -31,7 +37,11 @@ const actions = {
 
 // mutations
 const mutations = {
-  [types.ADD_ENTRY](s, { entry }) {
+  [types.POPULATE_ENTRIES](s, entries) {
+    s.entries.push(...entries);
+  },
+
+  [types.ADD_ENTRY](s, entry) {
     s.entries.push(entry);
   },
 
