@@ -1,5 +1,10 @@
 <template>
   <div>
+    <div class="controls">
+      <btn text="Previous week" v-on:click.native="weekOffset -= 1"></btn>
+      <btn text="Current week" v-on:click.native="weekOffset = 0"></btn>
+      <btn text="Next week" v-on:click.native="weekOffset += 1"></btn>
+    </div>
     <week v-bind:weekdays="currentWeek"></week>
   </div>
 </template>
@@ -7,20 +12,34 @@
 <script>
 import moment from 'moment';
 import Week from './Week';
+import Btn from './atoms/btn/Btn';
 
 export default {
   name: 'app-main',
   components: {
     Week,
+    Btn,
+  },
+  props: {
+    daysPerWeek: {
+      type: Number,
+      default: 7,
+    },
+  },
+  data() {
+    return {
+      weekOffset: 0,
+    };
   },
   computed: {
-    currentWeek: () => {
+    currentWeek() {
+      const initialWeekday = moment().startOf('isoweek');
+      initialWeekday.add(this.weekOffset, 'weeks');
+
       const weekdays = [];
-      let i = 0;
-      do {
-        weekdays.push(moment().startOf('isoweek').add(i, 'days'));
-        i += 1;
-      } while (i < 7);
+      for (let i = 0; i < this.daysPerWeek; i += 1) {
+        weekdays.push(initialWeekday.clone().add(i, 'days'));
+      }
       return weekdays;
     },
   },
