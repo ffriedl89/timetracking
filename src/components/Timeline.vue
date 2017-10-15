@@ -1,18 +1,23 @@
 <template>
   <div class="timeline" :style="styleObject">
-    <div class="timeline-entry" v-for="(time, index) in slots" v-bind:key="index" :class="{ 'timeline-entry--fullhour': isFullHour(time) }">
+    <div class="timeline-entry" v-for="(time, index) in slots" 
+      v-bind:key="index" 
+      :class="{ 'timeline-entry--fullhour': isFullHour(time) }" 
+      v-on:click="createEntry(time)" 
+      :style="styleForTimeline(index)">
       <div class="timeline-entry__label" v-if="showLabels && isFullHour(time)">
         {{time | moment('HH:mm')}}
       </div>
-      <div class="timeline-entry__slot">
-
-      </div>
+    </div>
+    <div class="entry" v-for="(entry, index) in entriesForDay(day)" :key="index" :style="styleForEntry(entry)">
+      {{entry.issue}}
     </div>
   </div>
 </template>
 
 <script>
 import moment from 'moment';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'timeline',
@@ -25,13 +30,17 @@ export default {
    * props
    */
   props: {
-    start: {
+    day: {
+      type: Object,
+      required: true,
+    },
+    startTime: {
       type: Object,
       default() {
         return moment('08:00', 'HH:mm');
       },
     },
-    end: {
+    endTime: {
       type: Object,
       default() {
         return moment('18:00', 'HH:mm');
@@ -46,13 +55,17 @@ export default {
    * computed props
    */
   computed: {
+    ...mapGetters([
+      'entriesForDay',
+    ]),
     diff() {
-      return this.end.diff(this.start, 'hours');
+      return this.endTime.diff(this.startTime, 'hours');
     },
     slots() {
       const moments = [];
+      this.day.hours(this.startTime.hours()).minutes(this.startTime.minutes());
       for (let i = 0; i < this.diff; i += this.step) {
-        moments.push(moment(this.start).add(i, 'hours'));
+        moments.push(moment(this.day).add(i, 'hours'));
       }
       return moments;
     },
@@ -66,6 +79,30 @@ export default {
     isFullHour(mom) {
       return mom.minute() === 0;
     },
+    createEntry(start) {
+      const startDate = moment(this.day).hours(start.hours()).minutes(start.minutes());
+      this.$store.dispatch('addEntry', {
+        id: 0,
+        start: startDate,
+        end: moment(startDate).add(30, 'minutes'),
+        issue: 'UX-1231',
+        comment: 'test 123123',
+      });
+    },
+    styleForEntry(entry) {
+      const rowStart = (entry.start.diff(this.day, 'minutes') / 60 / this.step) + 1;
+      const rowEnd = (entry.end.diff(this.day, 'minutes') / 60 / this.step) + 1;
+      return {
+        'grid-row': `${rowStart} / ${rowEnd}`,
+      };
+    },
+    styleForTimeline(index) {
+      const rowStart = index + 1;
+      const rowEnd = rowStart + 1;
+      return {
+        'grid-row': `${rowStart} / ${rowEnd}`,
+      };
+    },
   },
 };
 </script>
@@ -75,7 +112,11 @@ export default {
 
 .timeline {
   display: grid;
-  grid-auto-flow: column;
+  grid-template-columns: 1fr;
+}
+
+.timeline-entry {
+  grid-column: 1;
 }
 
 .timeline-entry--fullhour:not(:first-child) {
@@ -93,4 +134,14 @@ export default {
   padding-left: 0.25rem;
   line-height: 1.5rem;
 }
+
+.entry {
+  background-color: $green;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  margin: 0.25rem;
+  grid-column: 1;
+  opacity: 0.85;
+}
+
 </style>

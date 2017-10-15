@@ -1,13 +1,15 @@
 <template>
   <div class="day">
     <header class="day__header">{{day | moment("dddd, MMM Do YYYY")}}</header>
-    <div class="day__content">
-      <slot name="timeline" />
+    <div class="day__content" >
+      <timeline slot="timeline" :showLabels="showLabels" :day="day"/>
     </div>
   </div>
 </template>
 
 <script>
+import Timeline from './Timeline';
+
 export default {
   name: 'day',
   props: {
@@ -15,8 +17,14 @@ export default {
       type: Object,
       required: true,
     },
+    showLabels: {
+      type: Boolean,
+      default: false,
+    },
   },
-  components: {},
+  components: {
+    Timeline,
+  },
 };
 </script>
 
