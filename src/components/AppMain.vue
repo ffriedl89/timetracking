@@ -40,6 +40,7 @@ export default {
       for (let i = 0; i < this.daysPerWeek; i += 1) {
         weekdays.push(initialWeekday.clone().add(i, 'days'));
       }
+      this.$store.dispatch('loadWeekEntries', { start: weekdays[0], end: weekdays[this.daysPerWeek - 1] });
       return weekdays;
     },
   },
