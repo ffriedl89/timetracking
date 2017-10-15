@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import * as types from '../mutation-types';
 import Service from '../../service';
 
@@ -14,7 +15,11 @@ const getters = {
     && e.start.month() === day.month()
     && e.start.year() === day.year(),
   ),
+  entryById: s => entryId => s.entries.find(e => e.id === entryId),
 };
+
+const isValidEndChange = (entry, newEnd) =>
+  entry.start.isBefore(newEnd) && !entry.end.isSame(newEnd);
 
 // actions
 const actions = {
@@ -33,6 +38,21 @@ const actions = {
       id,
     });
   },
+  changeEntryEnd({ commit }, { entryId, slot }) {
+    const entry = this.getters.entryById(entryId);
+    if (entry && isValidEndChange(entry, slot)) {
+      commit(types.CHANGE_ENTRY_END, { entry, slot });
+    }
+  },
+  confirmEntryEnd({ commit }, { entryId, slot }) {
+    const entry = this.getters.entryById(entryId);
+    if (entry && isValidEndChange(entry, slot)) {
+      Service.changeEntryEnd(entry, slot)
+      .then((dbEntry) => {
+        commit(types.CHANGE_ENTRY_END, dbEntry);
+      });
+    }
+  },
 };
 
 // mutations
@@ -48,6 +68,11 @@ const mutations = {
   [types.REMOVE_ENTRY](s, { id }) {
     const index = s.entries.findIndex(entry => entry.id === id);
     s.entries.splice(index, 1);
+  },
+
+  [types.CHANGE_ENTRY_END](s, { entry, slot }) {
+    const index = s.entries.findIndex(e => e.id === entry.id);
+    Vue.set(s.entries, index, Object.assign(entry, { end: slot }));
   },
 };
 

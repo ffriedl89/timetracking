@@ -10,6 +10,12 @@ const SETTINGS = {
   messagingSenderId: '657882135042',
 };
 
+const getYearWeekKey = (date) => {
+  const week = date.week();
+  const year = date.year();
+  return `${year}_${week}`;
+};
+
 class Service {
   constructor() {
     this.app = initializeApp(SETTINGS);
@@ -48,13 +54,14 @@ class Service {
    * @param {timeentry} entry
    */
   addEntry(entry) {
-    const entryKey = this.dbRef.child('entries').push().key;
+    const yearWeek = getYearWeekKey(entry.start);
+    const entryKey = this.dbRef.child(`entries/${yearWeek}`).push().key;
     const payload = {
       ...entry,
       key: entryKey,
     };
     const updates = {};
-    updates[`entries/${entryKey}`] = this.serializeEntry(payload);
+    updates[`entries/${yearWeek}/${entryKey}`] = this.serializeEntry(payload);
     return this.dbRef.update(updates)
       .then(() => payload);
   }
@@ -66,9 +73,18 @@ class Service {
     return this.dbRef.child(`entries/${key}`).remove();
   }
 
-  loadEntriesForDay(day) {
-
+  changeEntryEnd(entry, end) {
+    const payload = {
+      ...entry,
+      end,
+    };
+    const updates = {};
+    updates[`entries/${entry.key}`] = this.serializeEntry(payload);
+    return this.dbRef.update(updates);
   }
+
+  // loadEntriesForWeekByDay(day) {
+  // }
 }
 
 export default new Service();
