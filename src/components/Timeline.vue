@@ -4,20 +4,25 @@
       v-bind:key="index" 
       :class="{ 'timeline-entry--fullhour': isFullHour(time) }" 
       v-on:click="createEntry(time)" 
+      v-on:dragover="(event) => onDragOver(event, time)"
+      v-on:drop="(event) => onDrop(event, time)"
       :style="styleForTimeline(index)">
       <div class="timeline-entry__label" v-if="showLabels && isFullHour(time)">
         {{time | moment('HH:mm')}}
       </div>
     </div>
-    <div class="entry" v-for="(entry, index) in entriesForDay(day)" :key="index" :style="styleForEntry(entry)">
-      {{entry.issue}}
-    </div>
+    <entry v-for="(entry, index) in entriesForDay(day)" 
+      :key="index"
+      :style="styleForEntry(entry)"
+      :id="entry.id">
+    </entry>
   </div>
 </template>
 
 <script>
 import moment from 'moment';
 import { mapGetters } from 'vuex';
+import Entry from './Entry';
 
 export default {
   name: 'timeline',
@@ -57,6 +62,7 @@ export default {
   computed: {
     ...mapGetters([
       'entriesForDay',
+      'draggedEntryId',
     ]),
     diff() {
       return this.endTime.diff(this.startTime, 'hours');
@@ -89,6 +95,20 @@ export default {
         comment: 'test 123123',
       });
     },
+    onDragOver(event, time) {
+      event.preventDefault();
+      this.$store.dispatch('changeEntryEnd', {
+        entryId: this.draggedEntryId,
+        slot: time,
+      });
+    },
+    onDrop(event, time) {
+      event.preventDefault();
+      this.$store.dispatch('confirmEntryEnd', {
+        entryId: this.draggedEntryId,
+        slot: time,
+      });
+    },
     styleForEntry(entry) {
       const rowStart = (entry.start.diff(this.day, 'minutes') / 60 / this.step) + 1;
       const rowEnd = (entry.end.diff(this.day, 'minutes') / 60 / this.step) + 1;
@@ -103,6 +123,9 @@ export default {
         'grid-row': `${rowStart} / ${rowEnd}`,
       };
     },
+  },
+  components: {
+    Entry,
   },
 };
 </script>
@@ -134,14 +157,4 @@ export default {
   padding-left: 0.25rem;
   line-height: 1.5rem;
 }
-
-.entry {
-  background-color: $green;
-  color: #fff;
-  padding: 0.5rem 1rem;
-  margin: 0.25rem;
-  grid-column: 1;
-  opacity: 0.85;
-}
-
 </style>

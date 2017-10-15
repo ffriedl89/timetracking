@@ -4,7 +4,7 @@
       <div class="entry__issue">
         {{issue}}
       </div>
-      <div class="entry__handle" v-on:dragstart="onDragStart" v-on:dragend="onDragEnd">
+      <div class="entry__handle" v-on:dragstart="onDragStart" v-on:dragend="onDragEnd" draggable="true">
         <svg class="handle" height="8" viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
           <path d="M0 100h400v50H0zM0 0h400v50H0z"/>
         </svg>
