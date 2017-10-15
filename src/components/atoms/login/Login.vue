@@ -26,7 +26,6 @@ export default {
       Service.login();
     },
     logout() {
-      console.log(Service);
       Service.logout();
     },
   },
