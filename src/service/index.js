@@ -38,6 +38,7 @@ class Service {
     this.queue.forEach((e) => {
       e.fn(...e.args);
     });
+    this.queue = [];
   }
 
   login() {
