@@ -18,8 +18,14 @@ const getters = {
 
 // actions
 const actions = {
-  populateEntries({ commit }, entries) {
-    commit(types.POPULATE_ENTRIES, entries);
+  loadWeekEntries(_, { start, end }) {
+    Service.loadEntries(start, end);
+  },
+
+  populateEntries({ commit, state }, entries) { // eslint-disable-line
+    const entriesToAdd = entries
+    .filter(({ key }) => !state.entries.some(e => e.key === key));
+    commit(types.POPULATE_ENTRIES, entriesToAdd);
   },
 
   addEntry({ commit }, entry) {
