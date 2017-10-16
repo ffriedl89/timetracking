@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="245px" height="245px" viewBox="0 0 245 245" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47 (45396) - http://www.bohemiancoding.com/sketch -->
+    <title>Logo</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Logo">
+            <g id="Group" transform="translate(54.000000, 23.000000)">
+                <path d="M119.320158,4.4145092 C153.619907,22.5086684 177,58.5239776 177,100 C177,108.779393 175.952435,117.314115 173.975482,125.485987 L69.8398438,93.244279 L65.7145918,0.301791319 L119.320158,4.4145092 Z" id="Combined-Shape" fill="#43A047"></path>
+                <path d="M117.245068,65.6702634 C135.646479,85.0374401 146.938313,111.224222 146.938313,140.048353 C146.938313,170.91371 133.990553,198.754956 113.230216,218.436908 L39.7781568,133.292632 L117.245068,65.6702634 Z" id="Combined-Shape" fill="#76D275" transform="translate(93.358235, 142.053586) rotate(55.000000) translate(-93.358235, -142.053586) "></path>
+            </g>
+            <path d="M36.8803387,183.085927 L36.8803387,183.085927 C55.8609462,210.239735 87.356407,228 123,228 C180.989899,228 228,180.989899 228,123 C228,65.0101013 180.989899,18 123,18 C121.813005,18 120.63061,18.0196963 119.453125,18.0587798" id="Combined-Shape" stroke="#FFFFFF" stroke-width="12"></path>
+        </g>
+    </g>
+</svg>
