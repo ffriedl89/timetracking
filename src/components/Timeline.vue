@@ -1,11 +1,9 @@
 <template>
-  <div class="timeline" :style="styleObject">
+  <div class="timeline" :style="styleObject" @mouseup="onMouseUp" @mousemove="onMouseMove">
     <div class="timeline-entry" v-for="(time, index) in slots" 
       v-bind:key="index" 
       :class="{ 'timeline-entry--fullhour': isFullHour(time) }" 
       v-on:click="createEntry(time)" 
-      v-on:dragover="(event) => onDragOver(event, time)"
-      v-on:drop="(event) => onDrop(event, time)"
       :style="styleForTimeline(index)">
       <div class="timeline-entry__label" v-if="showLabels && isFullHour(time)">
         {{time | moment('HH:mm')}}
@@ -14,7 +12,7 @@
     <entry v-for="(entry, index) in entriesForDay(day)" 
       :key="index"
       :style="styleForEntry(entry)"
-      :id="entry.id">
+      :entryKey="entry.key">
     </entry>
   </div>
 </template>
@@ -28,7 +26,7 @@ export default {
   name: 'timeline',
   data() {
     return {
-      step: 0.25,
+      slotHeightInRem: 1.5,
     };
   },
   /**
@@ -62,7 +60,8 @@ export default {
   computed: {
     ...mapGetters([
       'entriesForDay',
-      'draggedEntryId',
+      'isDragging',
+      'slotStepTime',
     ]),
     diff() {
       return this.endTime.diff(this.startTime, 'hours');
@@ -70,15 +69,20 @@ export default {
     slots() {
       const moments = [];
       this.day.hours(this.startTime.hours()).minutes(this.startTime.minutes());
-      for (let i = 0; i < this.diff; i += this.step) {
+      for (let i = 0; i < this.diff; i += this.slotStepTime) {
         moments.push(moment(this.day).add(i, 'hours'));
       }
       return moments;
     },
     styleObject() {
       return {
-        'grid-template-rows': `repeat(${this.slots.length}, 1.5rem)`,
+        'grid-template-rows': `repeat(${this.slots.length}, ${this.slotHeightInRem}rem)`,
       };
+    },
+    slotHeightInPx() {
+      const fontStr = window.getComputedStyle(document.querySelector('body'), null).getPropertyValue('font-size');
+      const fontSize = parseFloat(fontStr);
+      return fontSize * this.slotHeightInRem;
     },
   },
   methods: {
@@ -88,30 +92,15 @@ export default {
     createEntry(start) {
       const startDate = moment(this.day).hours(start.hours()).minutes(start.minutes());
       this.$store.dispatch('addEntry', {
-        id: 0,
         start: startDate,
         end: moment(startDate).add(30, 'minutes'),
         issue: 'UX-1231',
         comment: 'test 123123',
       });
     },
-    onDragOver(event, time) {
-      event.preventDefault();
-      this.$store.dispatch('changeEntryEnd', {
-        entryId: this.draggedEntryId,
-        slot: time,
-      });
-    },
-    onDrop(event, time) {
-      event.preventDefault();
-      this.$store.dispatch('confirmEntryEnd', {
-        entryId: this.draggedEntryId,
-        slot: time,
-      });
-    },
     styleForEntry(entry) {
-      const rowStart = (entry.start.diff(this.day, 'minutes') / 60 / this.step) + 1;
-      const rowEnd = (entry.end.diff(this.day, 'minutes') / 60 / this.step) + 1;
+      const rowStart = (entry.start.diff(this.day, 'minutes') / 60 / this.slotStepTime) + 1;
+      const rowEnd = (entry.end.diff(this.day, 'minutes') / 60 / this.slotStepTime) + 1;
       return {
         'grid-row': `${rowStart} / ${rowEnd}`,
       };
@@ -122,6 +111,18 @@ export default {
       return {
         'grid-row': `${rowStart} / ${rowEnd}`,
       };
+    },
+    onMouseUp(event) {
+      if (this.isDragging) {
+        const endY = event.pageY;
+        this.$store.dispatch('endDragEntryEnd', { endY });
+      }
+    },
+    onMouseMove(event) {
+      if (this.isDragging) {
+        const y = event.pageY;
+        this.$store.dispatch('dragMoveEntryEnd', { y, gap: this.slotHeightInPx });
+      }
     },
   },
   components: {

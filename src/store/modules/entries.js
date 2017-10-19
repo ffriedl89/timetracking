@@ -1,10 +1,13 @@
+ /* eslint-disable no-shadow, no-param-reassign */
 import Vue from 'vue';
+import moment from 'moment';
 import * as types from '../mutation-types';
 import Service from '../../service';
 
 // initial state
 const state = {
   entries: [],
+  slotStepTime: 0.25,
 };
 
 // getters
@@ -15,7 +18,8 @@ const getters = {
     && e.start.month() === day.month()
     && e.start.year() === day.year(),
   ),
-  entryById: s => entryId => s.entries.find(e => e.id === entryId),
+  entryByKey: s => key => s.entries.find(e => e.key === key),
+  slotStepTime: s => s.slotStepTime,
 };
 
 const isValidEndChange = (entry, newEnd) =>
@@ -34,24 +38,28 @@ const actions = {
   },
 
   addEntry({ commit }, entry) {
-    Service.addEntry(entry)
+    Service.addEntry({
+      ...entry,
+    })
       .then((dbEntry) => {
         commit(types.ADD_ENTRY, dbEntry);
       });
   },
-  removeEntry({ commit }, id) {
+  removeEntry({ commit }, key) {
     commit(types.REMOVE_ENTRY, {
-      id,
+      key,
     });
   },
-  changeEntryEnd({ commit }, { entryId, slot }) {
-    const entry = this.getters.entryById(entryId);
-    if (entry && isValidEndChange(entry, slot)) {
-      commit(types.CHANGE_ENTRY_END, { entry, slot });
+  changeEntryEnd({ commit, state }, { key, slotOffset }) {
+    const entry = this.getters.entryByKey(key);
+    console.log(slotOffset * state.slotStepTime);
+    const slotTime = moment(entry.end).add(slotOffset * state.slotStepTime, 'hours');
+    if (entry && isValidEndChange(entry, slotTime)) {
+      commit(types.CHANGE_ENTRY_END, { entry, slotTime });
     }
   },
-  confirmEntryEnd({ commit }, { entryId, slot }) {
-    const entry = this.getters.entryById(entryId);
+  confirmEntryEnd({ commit }, { key, slot }) {
+    const entry = this.getters.entryByKey(key);
     if (entry && isValidEndChange(entry, slot)) {
       Service.changeEntryEnd(entry, slot)
       .then((dbEntry) => {
@@ -71,14 +79,14 @@ const mutations = {
     s.entries.push(entry);
   },
 
-  [types.REMOVE_ENTRY](s, { id }) {
-    const index = s.entries.findIndex(entry => entry.id === id);
+  [types.REMOVE_ENTRY](s, { key }) {
+    const index = s.entries.findIndex(entry => entry.key === key);
     s.entries.splice(index, 1);
   },
 
-  [types.CHANGE_ENTRY_END](s, { entry, slot }) {
-    const index = s.entries.findIndex(e => e.id === entry.id);
-    Vue.set(s.entries, index, Object.assign(entry, { end: slot }));
+  [types.CHANGE_ENTRY_END](s, { entry, slotTime }) {
+    const index = s.entries.findIndex(e => e.key === entry.key);
+    Vue.set(s.entries, index, Object.assign(entry, { end: slotTime }));
   },
 };
 

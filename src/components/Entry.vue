@@ -1,10 +1,10 @@
 <template>
   <div class="entry-wrapper">
-    <div class="entry" :class="{'entry--dragging': dragging }">
+    <div class="entry" :class="{'entry--dragging': isDragging && draggedEntryKey === entryKey}">
       <div class="entry__issue">
         {{issue}}
       </div>
-      <div class="entry__handle" v-on:dragstart="onDragStart" v-on:dragend="onDragEnd" draggable="true">
+      <div class="entry__handle" @mousedown="onMouseDown" ref="resizeHandle" >
         <svg class="handle" height="8" viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
           <path d="M0 100h400v50H0zM0 0h400v50H0z"/>
         </svg>
@@ -14,28 +14,33 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'entry',
   data() {
     return {
       issue: 'UX-1231',
-      dragging: false,
     };
   },
   props: {
-    id: {
-      type: Number,
+    entryKey: {
+      type: String,
       required: true,
     },
   },
+  computed: {
+    ...mapGetters([
+      'isDragging',
+      'draggedEntryKey',
+    ]),
+  },
   methods: {
-    onDragStart() {
-      this.$store.dispatch('startDragEntryEnd', this.id);
+    onMouseDown(event) {
+      event.preventDefault();
+      const startY = event.pageY;
+      this.$store.dispatch('startDragEntryEnd', { key: this.entryKey, startY });
       this.dragging = true;
-    },
-    onDragEnd() {
-      this.$store.dispatch('endDragEntryEnd');
-      this.dragging = false;
     },
   },
 };
@@ -45,7 +50,7 @@ export default {
 @import '../scss/variables';
 
 .entry-wrapper {
-  margin: 0.25rem;
+  padding: 0.25rem;
   grid-column: 1;
 }
 
@@ -57,10 +62,12 @@ export default {
   grid-template-rows: auto 12px;
   grid-template-columns: 1fr;
   height: 100%;
+  transition: box-shadow 0.3s ease-in-out; 
 }
 
 .entry--dragging {
   opacity: 0.85;
+  box-shadow: $shadow;
 }
 
 .entry__issue {

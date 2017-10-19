@@ -6,4 +6,6 @@ export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
 
 export const START_DRAG_ENTRY_END = 'START_DRAG_ENTRY_END';
+export const SET_DRAG_START = 'SET_DRAG_START';
 export const END_DRAG_ENTRY_END = 'END_DRAG_ENTRY_END';
+export const DRAG_MOVE_ENTRY_END = 'DRAG_MOVE_ENTRY_END';
