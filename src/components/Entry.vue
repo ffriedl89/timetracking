@@ -54,29 +54,19 @@ export default {
     onMouseDown(event) {
       event.preventDefault();
       this.dragging = true;
-      this.startY = event.pageY;
+      this.startY = event.y;
+      this.originalHeight = this.$el.offsetHeight;
+      this.$el.style.height = `${this.originalHeight - 4}px`;
       // /** initialMove to jump to next slot immediately */
       this.initialMove = true;
       window.addEventListener('mousemove', this.onMouseMove);
       window.addEventListener('mouseup', this.onMouseUp);
     },
     onMouseMove(event) {
-      this.dragOffsetY = this.startY - event.pageY;
-      if (Math.abs(this.dragOffsetY) > this.slotHeight) {
-        if (this.dragOffsetY > 0) {
-          /**
-           * upwards
-           */
-          this.end -= 1;
-        } else {
-          /**
-           * downwards
-           */
-          this.end += 1;
-        }
-        this.startY = event.pageY;
-      }
-      this.initialMove = false;
+      this.dragOffsetY = this.startY - event.y;
+      const newHeight = Math.floor((this.originalHeight - this.dragOffsetY) / this.slotHeight) * this.slotHeight; // eslint-disable-line
+      this.$el.style.height = `${Math.max(this.slotHeight, newHeight)}px`;
+      // this.initialMove = false;
     },
     onMouseUp() {
       window.removeEventListener('mousemove', this.onMouseMove);
