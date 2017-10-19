@@ -1,5 +1,5 @@
 <template>
-  <div class="timeline" :style="styleObject" @mouseup="onMouseUp" @mousemove="onMouseMove">
+  <div class="timeline" :style="styleObject">
     <div class="timeline-entry" v-for="(time, index) in slots" 
       v-bind:key="index" 
       :class="{ 'timeline-entry--fullhour': isFullHour(time) }" 
@@ -11,8 +11,9 @@
     </div>
     <entry v-for="(entry, index) in entriesForDay(day)" 
       :key="index"
-      :style="styleForEntry(entry)"
-      :entryKey="entry.key">
+      :entryKey="entry.key"
+      v-bind="rowSpanForEntry(entry)"
+      :slotHeight="slotHeightInPx">
     </entry>
   </div>
 </template>
@@ -60,7 +61,6 @@ export default {
   computed: {
     ...mapGetters([
       'entriesForDay',
-      'isDragging',
       'slotStepTime',
     ]),
     diff() {
@@ -98,11 +98,12 @@ export default {
         comment: 'test 123123',
       });
     },
-    styleForEntry(entry) {
+    rowSpanForEntry(entry) {
       const rowStart = (entry.start.diff(this.day, 'minutes') / 60 / this.slotStepTime) + 1;
       const rowEnd = (entry.end.diff(this.day, 'minutes') / 60 / this.slotStepTime) + 1;
       return {
-        'grid-row': `${rowStart} / ${rowEnd}`,
+        rowStart,
+        rowEnd,
       };
     },
     styleForTimeline(index) {
@@ -112,18 +113,18 @@ export default {
         'grid-row': `${rowStart} / ${rowEnd}`,
       };
     },
-    onMouseUp(event) {
-      if (this.isDragging) {
-        const endY = event.pageY;
-        this.$store.dispatch('endDragEntryEnd', { endY });
-      }
-    },
-    onMouseMove(event) {
-      if (this.isDragging) {
-        const y = event.pageY;
-        this.$store.dispatch('dragMoveEntryEnd', { y, gap: this.slotHeightInPx });
-      }
-    },
+    // onMouseUp(event) {
+    //   if (this.isDragging) {
+    //     const endY = event.pageY;
+    //     this.$store.dispatch('endDragEntryEnd', { endY });
+    //   }
+    // },
+    // onMouseMove(event) {
+    //   if (this.isDragging) {
+    //     const y = event.pageY;
+    //     this.$store.dispatch('dragMoveEntryEnd', { y, gap: this.slotHeightInPx });
+    //   }
+    // },
   },
   components: {
     Entry,

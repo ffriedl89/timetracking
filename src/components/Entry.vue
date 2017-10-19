@@ -1,6 +1,6 @@
 <template>
-  <div class="entry-wrapper">
-    <div class="entry" :class="{'entry--dragging': isDragging && draggedEntryKey === entryKey}">
+  <div class="entry-wrapper" ref="wrapper" :style="styleObject">
+    <div class="entry" :class="{'entry--dragging': dragging}">
       <div class="entry__issue">
         {{issue}}
       </div>
@@ -14,13 +14,15 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-
 export default {
   name: 'entry',
   data() {
     return {
       issue: 'UX-1231',
+      startY: 0,
+      initialMove: false,
+      dragging: false,
+      end: 0,
     };
   },
   props: {
@@ -28,20 +30,63 @@ export default {
       type: String,
       required: true,
     },
+    rowStart: {
+      type: Number,
+      required: true,
+    },
+    rowEnd: {
+      type: Number,
+      required: true,
+    },
+    slotHeight: {
+      type: Number,
+      required: true,
+    },
   },
   computed: {
-    ...mapGetters([
-      'isDragging',
-      'draggedEntryKey',
-    ]),
+    styleObject() {
+      return {
+        'grid-row': `${this.rowStart} / ${this.end}`,
+      };
+    },
   },
   methods: {
     onMouseDown(event) {
       event.preventDefault();
-      const startY = event.pageY;
-      this.$store.dispatch('startDragEntryEnd', { key: this.entryKey, startY });
       this.dragging = true;
+      this.startY = event.pageY;
+      // /** initialMove to jump to next slot immediately */
+      this.initialMove = true;
+      window.addEventListener('mousemove', this.onMouseMove);
+      window.addEventListener('mouseup', this.onMouseUp);
     },
+    onMouseMove(event) {
+      this.dragOffsetY = this.startY - event.pageY;
+      if (Math.abs(this.dragOffsetY) > this.slotHeight) {
+        if (this.dragOffsetY > 0) {
+          /**
+           * upwards
+           */
+          this.end -= 1;
+        } else {
+          /**
+           * downwards
+           */
+          this.end += 1;
+        }
+        this.startY = event.pageY;
+      }
+      this.initialMove = false;
+    },
+    onMouseUp() {
+      window.removeEventListener('mousemove', this.onMouseMove);
+      window.removeEventListener('mouseup', this.onMouseUp);
+      this.dragging = false;
+      // TODO: send to store
+    },
+  },
+  created() {
+    this.end = this.rowEnd;
   },
 };
 </script>
