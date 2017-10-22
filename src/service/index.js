@@ -1,6 +1,7 @@
 import { initializeApp, auth, database } from 'firebase';
 import moment from 'moment';
 import store from '../store';
+import router from '../router';
 
 const SETTINGS = {
   apiKey: 'AIzaSyAPMWLjeu2PkjCimTSJeHUoudfCsY7XAJg',
@@ -26,10 +27,12 @@ class Service {
         this.userKey = user.uid;
         this.dbRef = database().ref(this.userKey);
         this.runQueue();
+        router.push({ path: '/' });
       } else {
         store.dispatch('logout');
         this.userKey = undefined;
         this.dbRef = undefined;
+        router.push({ path: '/login' });
       }
     });
   }

@@ -2,8 +2,18 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import AppMain from '@/components/AppMain';
 import AppHeader from '@/components/AppHeader';
+import AppLogin from '@/components/AppLogin';
+import Service from '@/service';
 
 Vue.use(Router);
+
+const checkLoggedin = (to, from, next) => {
+  if (!Service.userKey) {
+    next('/login');
+    return;
+  }
+  next();
+};
 
 export default new Router({
   routes: [
@@ -13,6 +23,14 @@ export default new Router({
       components: {
         default: AppMain,
         header: AppHeader,
+      },
+      beforeEnter: checkLoggedin,
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      components: {
+        default: AppLogin,
       },
     },
   ],
