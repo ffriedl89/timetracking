@@ -2,7 +2,7 @@
   <div class="entry-wrapper" ref="wrapper" :style="styleObject">
     <div class="entry" :class="{'entry--dragging': dragging}">
       <div class="entry__issue">
-        {{issue}}
+        {{entry.start.format('hh:mm:ss')}} {{entry.end.format('hh:mm:ss')}}
       </div>
       <div class="entry__handle" @mousedown="onMouseDown" ref="resizeHandle" >
         <svg class="handle" height="8" viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import moment from 'moment';
+
 export default {
   name: 'entry',
   data() {
@@ -21,8 +23,13 @@ export default {
       issue: 'UX-1231',
       startY: 0,
       initialMove: false,
-      dragging: false,
       end: 0,
+      dragging: false,
+      timeConstraints: {
+        start: null,
+        end: null,
+      },
+      newEnd: null,
     };
   },
   props: {
@@ -44,6 +51,9 @@ export default {
     },
   },
   computed: {
+    entry() {
+      return this.$store.getters.entryByKey(this.entryKey);
+    },
     styleObject() {
       return {
         'grid-row': `${this.rowStart} / ${this.end}`,
@@ -53,26 +63,30 @@ export default {
   methods: {
     onMouseDown(event) {
       event.preventDefault();
-      this.dragging = true;
+      this.$store.dispatch('startDragEntryEnd');
       this.startY = event.y;
       this.originalHeight = this.$el.offsetHeight;
-      this.$el.style.height = `${this.originalHeight - 4}px`;
-      // /** initialMove to jump to next slot immediately */
-      this.initialMove = true;
+      this.$el.style.height = `${this.originalHeight}px`;
+      this.dragging = true;
+      this.timeConstraints = this.$store.getters.dragConstraints(this.entryKey);
+      console.log('end', this.timeConstraints.end.format('hh:mm:ss'));
       window.addEventListener('mousemove', this.onMouseMove);
       window.addEventListener('mouseup', this.onMouseUp);
     },
     onMouseMove(event) {
       this.dragOffsetY = this.startY - event.y;
-      const newHeight = Math.floor((this.originalHeight - this.dragOffsetY) / this.slotHeight) * this.slotHeight; // eslint-disable-line
-      this.$el.style.height = `${Math.max(this.slotHeight, newHeight)}px`;
-      // this.initialMove = false;
+      const slotDiff = Math.ceil(this.dragOffsetY / this.slotHeight) * -1;
+      this.newEnd = moment(this.entry.end).add(slotDiff * 15, 'minutes');
+      if (this.newEnd.isSameOrBefore(this.timeConstraints.end) && this.newEnd.isSameOrAfter(this.timeConstraints.start)) { // eslint-disable-line max-len
+        const newHeight = Math.floor((this.originalHeight - this.dragOffsetY) / this.slotHeight) * this.slotHeight; // eslint-disable-line max-len
+        this.$el.style.height = `${Math.max(this.slotHeight, newHeight)}px`;
+      }
     },
     onMouseUp() {
       window.removeEventListener('mousemove', this.onMouseMove);
       window.removeEventListener('mouseup', this.onMouseUp);
+      this.$store.dispatch('updateEntry', { key: this.entryKey, end: this.newEnd });
       this.dragging = false;
-      // TODO: send to store
     },
   },
   created() {
@@ -85,7 +99,7 @@ export default {
 @import '../scss/variables';
 
 .entry-wrapper {
-  padding: 0.25rem;
+  padding: 0 0.25rem;
   grid-column: 1;
 }
 

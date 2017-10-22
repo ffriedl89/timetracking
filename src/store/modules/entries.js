@@ -17,13 +17,53 @@ const getters = {
     e.start.date() === day.date()
     && e.start.month() === day.month()
     && e.start.year() === day.year(),
-  ),
+  ).sort((a, b) => {
+    if (a.start.isBefore(b.start)) {
+      return -1;
+    }
+    if (a.start.isAfter(b.start)) {
+      return 1;
+    }
+    return 0;
+  }),
   entryByKey: s => key => s.entries.find(e => e.key === key),
   slotStepTime: s => s.slotStepTime,
-};
+  dragConstraints: (state, getters) => (key) => {
+    /**
+     * get entry
+     */
+    const entry = getters.entryByKey(key);
+    /**
+     * get entries for same day
+     */
+    const entriesForDay = getters.entriesForDay(entry.start);
+    /**
+     * get position of entry in sorted entries array
+     */
+    const index = entriesForDay.findIndex(e => e.key === key);
+    /**
+     * set end constraint to start of next entry or end of day
+     */
+    let endConstraint;
+    if (index + 1 < entriesForDay.length) {
+      /**
+       * start of next entry
+       */
+      endConstraint = entriesForDay[index + 1].start;
+    } else {
+      /**
+       * end of day
+       */
+      endConstraint = moment(entry.start).endOf('day');
+    }
 
-const isValidEndChange = (entry, newEnd) =>
-  entry.start.isBefore(newEnd) && !entry.end.isSame(newEnd);
+    const startConstraint = moment(entry.start).add(15, 'minutes');
+    return {
+      start: startConstraint,
+      end: endConstraint,
+    };
+  },
+};
 
 // actions
 const actions = {
@@ -38,7 +78,7 @@ const actions = {
   },
 
   addEntry({ commit }, entry) {
-    Service.addEntry({
+    Service.addOrUpdateEntry({
       ...entry,
     })
       .then((dbEntry) => {
@@ -50,22 +90,16 @@ const actions = {
       key,
     });
   },
-  changeEntryEnd({ commit, state }, { key, slotOffset }) {
-    const entry = this.getters.entryByKey(key);
-    console.log(slotOffset * state.slotStepTime);
-    const slotTime = moment(entry.end).add(slotOffset * state.slotStepTime, 'hours');
-    if (entry && isValidEndChange(entry, slotTime)) {
-      commit(types.CHANGE_ENTRY_END, { entry, slotTime });
-    }
-  },
-  confirmEntryEnd({ commit }, { key, slot }) {
-    const entry = this.getters.entryByKey(key);
-    if (entry && isValidEndChange(entry, slot)) {
-      Service.changeEntryEnd(entry, slot)
-      .then((dbEntry) => {
-        commit(types.CHANGE_ENTRY_END, dbEntry);
+  updateEntry({ state, commit }, { key, end }) {
+    const entry = state.entries.find(e => e.key === key);
+    Service.addOrUpdateEntry({
+      ...entry,
+      end,
+    }).then((dbEntry) => {
+      commit(types.UPDATE_ENTRY, {
+        ...dbEntry,
       });
-    }
+    });
   },
 };
 
@@ -84,9 +118,9 @@ const mutations = {
     s.entries.splice(index, 1);
   },
 
-  [types.CHANGE_ENTRY_END](s, { entry, slotTime }) {
+  [types.UPDATE_ENTRY](s, entry) {
     const index = s.entries.findIndex(e => e.key === entry.key);
-    Vue.set(s.entries, index, Object.assign(entry, { end: slotTime }));
+    Vue.set(s.entries, index, entry);
   },
 };
 

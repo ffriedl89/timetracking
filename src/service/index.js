@@ -11,12 +11,6 @@ const SETTINGS = {
   messagingSenderId: '657882135042',
 };
 
-const getYearWeekKey = (date) => {
-  const week = date.week();
-  const year = date.year();
-  return `${year}_${week}`;
-};
-
 class Service {
   constructor() {
     this.app = initializeApp(SETTINGS);
@@ -72,12 +66,11 @@ class Service {
   }
 
   /**
-   * Adds a timeentry to the user spaced database in firebase
+   * Adds or updates a timeentry to the user spaced database in firebase
    * @param {timeentry} entry
    */
-  addEntry(entry) {
-    const yearWeek = getYearWeekKey(entry.start);
-    const entryKey = this.dbRef.child(`entries/${yearWeek}`).push().key;
+  addOrUpdateEntry(entry) {
+    const entryKey = this.dbRef.child('entries').push().key;
     const payload = {
       ...entry,
       key: entryKey,
@@ -93,6 +86,15 @@ class Service {
    */
   removeEntry(key) {
     return this.dbRef.child(`entries/${key}`).remove();
+  }
+
+  /**
+   * update an entry in the database
+   * @param {timeentry} - updated entry
+   * @returns updated entry returned from db
+   */
+  updateEntry(entry) {
+    return this.dbRef.child(`entries/${entry}`)();
   }
 
   /**
@@ -120,9 +122,6 @@ class Service {
       .then(entries => entries.map(entry => Service.deserializeEntry(entry)))
       .then(entries => store.dispatch('populateEntries', entries));
   }
-
-  // loadEntriesForWeekByDay(day) {
-  // }
 }
 
 export default new Service();

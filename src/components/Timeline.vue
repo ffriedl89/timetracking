@@ -1,5 +1,5 @@
 <template>
-  <div class="timeline" :style="styleObject">
+  <div class="timeline" :class="{ 'timeline--dragging': isDragging }" :style="styleObject" >
     <div class="timeline-entry" v-for="(time, index) in slots" 
       v-bind:key="index" 
       :class="{ 'timeline-entry--fullhour': isFullHour(time) }" 
@@ -62,6 +62,7 @@ export default {
     ...mapGetters([
       'entriesForDay',
       'slotStepTime',
+      'isDragging',
     ]),
     diff() {
       return this.endTime.diff(this.startTime, 'hours');
@@ -113,18 +114,6 @@ export default {
         'grid-row': `${rowStart} / ${rowEnd}`,
       };
     },
-    // onMouseUp(event) {
-    //   if (this.isDragging) {
-    //     const endY = event.pageY;
-    //     this.$store.dispatch('endDragEntryEnd', { endY });
-    //   }
-    // },
-    // onMouseMove(event) {
-    //   if (this.isDragging) {
-    //     const y = event.pageY;
-    //     this.$store.dispatch('dragMoveEntryEnd', { y, gap: this.slotHeightInPx });
-    //   }
-    // },
   },
   components: {
     Entry,
@@ -148,7 +137,7 @@ export default {
   border-top: 1px solid $gray-dark;
 }
 
-.timeline-entry:hover {
+.timeline:not(.timeline--dragging) .timeline-entry:hover {
   background-color: $green;
   color: #fff;
 }
