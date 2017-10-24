@@ -81,7 +81,7 @@ export default {
       };
     },
     slotHeightInPx() {
-      const fontStr = window.getComputedStyle(document.querySelector('body'), null).getPropertyValue('font-size');
+      const fontStr = window.getComputedStyle(document.querySelector('html'), null).getPropertyValue('font-size');
       const fontSize = parseFloat(fontStr);
       return fontSize * this.slotHeightInRem;
     },

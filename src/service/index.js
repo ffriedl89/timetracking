@@ -89,15 +89,6 @@ class Service {
   }
 
   /**
-   * update an entry in the database
-   * @param {timeentry} - updated entry
-   * @returns updated entry returned from db
-   */
-  updateEntry(entry) {
-    return this.dbRef.child(`entries/${entry}`)();
-  }
-
-  /**
    * Load Entries from firebase or from the @todo cache
    * Dispatches `populateEntries` to store
    * @param {moment} start
