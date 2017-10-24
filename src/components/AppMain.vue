@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <main class="app-main">
     <div class="controls">
       <btn text="Previous week" v-on:click.native="weekOffset -= 1"></btn>
       <btn text="Current week" v-on:click.native="weekOffset = 0"></btn>
       <btn text="Next week" v-on:click.native="weekOffset += 1"></btn>
     </div>
     <week v-bind:weekdays="currentWeek"></week>
-  </div>
+  </main>
 </template>
 
 <script>
@@ -46,3 +46,10 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.app-main {
+  padding: 0 1rem 1rem;
+}
+</style>
+

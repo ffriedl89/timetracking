@@ -11,7 +11,9 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+@import './scss/variables';
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   font-size: 16px;
@@ -19,7 +21,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  /* margin-top: 60px; */
+  background-color: $bg-color;
 }
 
 body {
