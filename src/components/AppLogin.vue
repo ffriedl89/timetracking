@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="login">
-      <img class="logo" src="../assets/logo.svg" alt="">
+      <img width="245px" height="245px" class="logo" src="../assets/logo.svg" alt="">
       <h2>Timetracking</h2>
       <btn v-on:click.native="login">Login with google</btn>
     </div>
@@ -47,9 +47,6 @@ export default {
     padding-right: 3rem;
     max-width: 100%;
     box-sizing: border-box;
-  }
-
-  .btn {
-
+    width: 100%;
   }
 </style>
