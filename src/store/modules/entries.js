@@ -99,6 +99,7 @@ const actions = {
       commit(types.UPDATE_ENTRY, {
         ...dbEntry,
       });
+      commit(types.END_DRAG_ENTRY_END);
     });
   },
 };

@@ -70,7 +70,7 @@ class Service {
    * @param {timeentry} entry
    */
   addOrUpdateEntry(entry) {
-    const entryKey = this.dbRef.child('entries').push().key;
+    const entryKey = entry.key || this.dbRef.child('entries').push().key;
     const payload = {
       ...entry,
       key: entryKey,

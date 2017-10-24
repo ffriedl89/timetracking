@@ -138,7 +138,7 @@ export default {
 }
 
 .timeline:not(.timeline--dragging) .timeline-entry:hover {
-  background-color: $green;
+  background-color: lighten($green, 30%);
   color: #fff;
 }
 
