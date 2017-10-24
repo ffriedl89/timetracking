@@ -1,9 +1,13 @@
+ /* eslint-disable no-shadow, no-param-reassign */
+import Vue from 'vue';
+import moment from 'moment';
 import * as types from '../mutation-types';
 import Service from '../../service';
 
 // initial state
 const state = {
   entries: [],
+  slotStepTime: 0.25,
 };
 
 // getters
@@ -13,7 +17,52 @@ const getters = {
     e.start.date() === day.date()
     && e.start.month() === day.month()
     && e.start.year() === day.year(),
-  ),
+  ).sort((a, b) => {
+    if (a.start.isBefore(b.start)) {
+      return -1;
+    }
+    if (a.start.isAfter(b.start)) {
+      return 1;
+    }
+    return 0;
+  }),
+  entryByKey: s => key => s.entries.find(e => e.key === key),
+  slotStepTime: s => s.slotStepTime,
+  dragConstraints: (state, getters) => (key) => {
+    /**
+     * get entry
+     */
+    const entry = getters.entryByKey(key);
+    /**
+     * get entries for same day
+     */
+    const entriesForDay = getters.entriesForDay(entry.start);
+    /**
+     * get position of entry in sorted entries array
+     */
+    const index = entriesForDay.findIndex(e => e.key === key);
+    /**
+     * set end constraint to start of next entry or end of day
+     */
+    let endConstraint;
+    if (index + 1 < entriesForDay.length) {
+      /**
+       * start of next entry
+       */
+      endConstraint = entriesForDay[index + 1].start;
+    } else {
+      /**
+       * end of day
+       */
+      endConstraint = moment(entry.start).endOf('day');
+    }
+
+    const startConstraint = moment(entry.start).add(15, 'minutes');
+    return {
+      start: startConstraint,
+      end: endConstraint,
+    };
+  },
 };
 
 // actions
@@ -29,14 +78,28 @@ const actions = {
   },
 
   addEntry({ commit }, entry) {
-    Service.addEntry(entry)
+    Service.addOrUpdateEntry({
+      ...entry,
+    })
       .then((dbEntry) => {
         commit(types.ADD_ENTRY, dbEntry);
       });
   },
-  removeEntry({ commit }, id) {
+  removeEntry({ commit }, key) {
     commit(types.REMOVE_ENTRY, {
-      id,
+      key,
+    });
+  },
+  updateEntry({ state, commit }, { key, end }) {
+    const entry = state.entries.find(e => e.key === key);
+    Service.addOrUpdateEntry({
+      ...entry,
+      end,
+    }).then((dbEntry) => {
+      commit(types.UPDATE_ENTRY, {
+        ...dbEntry,
+      });
+      commit(types.END_DRAG_ENTRY_END);
     });
   },
 };
@@ -51,9 +114,14 @@ const mutations = {
     s.entries.push(entry);
   },
 
-  [types.REMOVE_ENTRY](s, { id }) {
-    const index = s.entries.findIndex(entry => entry.id === id);
+  [types.REMOVE_ENTRY](s, { key }) {
+    const index = s.entries.findIndex(entry => entry.key === key);
     s.entries.splice(index, 1);
+  },
+
+  [types.UPDATE_ENTRY](s, entry) {
+    const index = s.entries.findIndex(e => e.key === entry.key);
+    Vue.set(s.entries, index, entry);
   },
 };
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="timeline" :style="styleObject">
+  <div class="timeline" :class="{ 'timeline--dragging': isDragging }" :style="styleObject" >
     <div class="timeline-entry" v-for="(time, index) in slots" 
       v-bind:key="index" 
       :class="{ 'timeline-entry--fullhour': isFullHour(time) }" 
@@ -9,21 +9,25 @@
         {{time | moment('HH:mm')}}
       </div>
     </div>
-    <div class="entry" v-for="(entry, index) in entriesForDay(day)" :key="index" :style="styleForEntry(entry)">
-      {{entry.issue}}
-    </div>
+    <entry v-for="(entry, index) in entriesForDay(day)" 
+      :key="index"
+      :entryKey="entry.key"
+      v-bind="rowSpanForEntry(entry)"
+      :slotHeight="slotHeightInPx">
+    </entry>
   </div>
 </template>
 
 <script>
 import moment from 'moment';
 import { mapGetters } from 'vuex';
+import Entry from './Entry';
 
 export default {
   name: 'timeline',
   data() {
     return {
-      step: 0.25,
+      slotHeightInRem: 1.5,
     };
   },
   /**
@@ -57,6 +61,8 @@ export default {
   computed: {
     ...mapGetters([
       'entriesForDay',
+      'slotStepTime',
+      'isDragging',
     ]),
     diff() {
       return this.endTime.diff(this.startTime, 'hours');
@@ -64,15 +70,20 @@ export default {
     slots() {
       const moments = [];
       this.day.hours(this.startTime.hours()).minutes(this.startTime.minutes());
-      for (let i = 0; i < this.diff; i += this.step) {
+      for (let i = 0; i < this.diff; i += this.slotStepTime) {
         moments.push(moment(this.day).add(i, 'hours'));
       }
       return moments;
     },
     styleObject() {
       return {
-        'grid-template-rows': `repeat(${this.slots.length}, 1.5rem)`,
+        'grid-template-rows': `repeat(${this.slots.length}, ${this.slotHeightInRem}rem)`,
       };
+    },
+    slotHeightInPx() {
+      const fontStr = window.getComputedStyle(document.querySelector('html'), null).getPropertyValue('font-size');
+      const fontSize = parseFloat(fontStr);
+      return fontSize * this.slotHeightInRem;
     },
   },
   methods: {
@@ -82,18 +93,18 @@ export default {
     createEntry(start) {
       const startDate = moment(this.day).hours(start.hours()).minutes(start.minutes());
       this.$store.dispatch('addEntry', {
-        id: 0,
         start: startDate,
         end: moment(startDate).add(30, 'minutes'),
         issue: 'UX-1231',
         comment: 'test 123123',
       });
     },
-    styleForEntry(entry) {
-      const rowStart = (entry.start.diff(this.day, 'minutes') / 60 / this.step) + 1;
-      const rowEnd = (entry.end.diff(this.day, 'minutes') / 60 / this.step) + 1;
+    rowSpanForEntry(entry) {
+      const rowStart = (entry.start.diff(this.day, 'minutes') / 60 / this.slotStepTime) + 1;
+      const rowEnd = (entry.end.diff(this.day, 'minutes') / 60 / this.slotStepTime) + 1;
       return {
-        'grid-row': `${rowStart} / ${rowEnd}`,
+        rowStart,
+        rowEnd,
       };
     },
     styleForTimeline(index) {
@@ -103,6 +114,9 @@ export default {
         'grid-row': `${rowStart} / ${rowEnd}`,
       };
     },
+  },
+  components: {
+    Entry,
   },
 };
 </script>
@@ -123,8 +137,8 @@ export default {
   border-top: 1px solid $gray-dark;
 }
 
-.timeline-entry:hover {
-  background-color: $green;
+.timeline:not(.timeline--dragging) .timeline-entry:hover {
+  background-color: lighten($green, 30%);
   color: #fff;
 }
 
@@ -134,14 +148,4 @@ export default {
   padding-left: 0.25rem;
   line-height: 1.5rem;
 }
-
-.entry {
-  background-color: $green;
-  color: #fff;
-  padding: 0.5rem 1rem;
-  margin: 0.25rem;
-  grid-column: 1;
-  opacity: 0.85;
-}
-
 </style>
