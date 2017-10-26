@@ -90,16 +90,17 @@ const actions = {
       key,
     });
   },
-  updateEntry({ state, commit }, { key, end }) {
+  updateEntry({ state, commit }, { key, start, end }) {
     const entry = state.entries.find(e => e.key === key);
     Service.addOrUpdateEntry({
       ...entry,
+      start,
       end,
     }).then((dbEntry) => {
       commit(types.UPDATE_ENTRY, {
         ...dbEntry,
       });
-      commit(types.END_DRAG_ENTRY_END);
+      commit(types.END_DRAG);
     });
   },
 };

@@ -1,10 +1,10 @@
 <template>
-  <div class="entry-wrapper" ref="wrapper" :style="styleObject">
-    <div class="entry" :class="{'entry--dragging': dragging}">
+  <div class="entry-wrapper" ref="wrapper" :style="styleObject" @mousedown="entryMouseDown">
+    <div class="entry" :class="{'entry--dragging': dragging, 'entry--moving': moving}">
       <div class="entry__info">
-        {{entry.start.format('HH:mm:ss')}} - {{newEnd ? newEnd.format('HH:mm:ss') : entry.end.format('HH:mm:ss')}}
+        {{newStart ? newStart.format('HH:mm:ss') : entry.start.format('HH:mm:ss')}} - {{newEnd ? newEnd.format('HH:mm:ss') : entry.end.format('HH:mm:ss')}}
       </div>
-      <div class="entry__handle" @mousedown="onMouseDown" ref="resizeHandle" >
+      <div class="entry__handle" @mousedown="resizeMouseDown" ref="resizeHandle" >
       </div>
     </div>
   </div>
@@ -20,13 +20,17 @@ export default {
     return {
       issue: 'UX-1231',
       startY: 0,
-      initialMove: false,
       dragging: false,
+      moving: false,
       timeConstraints: {
         start: null,
         end: null,
       },
+      newStart: null,
       newEnd: null,
+      offsetFromEntryStartSlots: 0,
+      dayMoved: null,
+      entriesForDayMoved: [],
     };
   },
   props: {
@@ -54,6 +58,7 @@ export default {
     styleObject() {
       Vue.nextTick(() => {
         this.$el.style.height = '';
+        this.$el.style.left = '';
       });
       return {
         'grid-row': `${this.rowStart} / ${this.rowEnd}`,
@@ -61,18 +66,21 @@ export default {
     },
   },
   methods: {
-    onMouseDown(event) {
+    resizeMouseDown(event) {
       event.preventDefault();
-      this.$store.dispatch('startDragEntryEnd');
+      event.stopPropagation();
+      this.$store.dispatch('startDrag');
       this.startY = event.y;
       this.originalHeight = this.$el.offsetHeight;
       this.$el.style.height = `${this.originalHeight}px`;
+      this.dayMoved = this.getMomentFromDayDom(this.getDayFromMouseEvent(event));
       this.dragging = true;
       this.timeConstraints = this.$store.getters.dragConstraints(this.entryKey);
-      window.addEventListener('mousemove', this.onMouseMove);
+      this.newStart = this.entry.start;
+      window.addEventListener('mousemove', this.onMouseMoveForResize);
       window.addEventListener('mouseup', this.onMouseUp);
     },
-    onMouseMove(event) {
+    onMouseMoveForResize(event) {
       this.dragOffsetY = this.startY - event.y;
       const slotDiff = Math.ceil(this.dragOffsetY / this.slotHeight) * -1;
       const moved = moment(this.entry.end).add(slotDiff * 15, 'minutes');
@@ -83,10 +91,81 @@ export default {
       }
     },
     onMouseUp() {
-      window.removeEventListener('mousemove', this.onMouseMove);
+      window.removeEventListener('mousemove', this.onMouseMoveForResize);
+      window.removeEventListener('mousemove', this.onMouseMoveForMove);
       window.removeEventListener('mouseup', this.onMouseUp);
-      this.$store.dispatch('updateEntry', { key: this.entryKey, end: this.newEnd });
       this.dragging = false;
+      this.$el.style.pointerEvents = '';
+      if (!this.doesOverlap()) {
+        this.$store.dispatch('updateEntry', { key: this.entryKey, start: this.newStart, end: this.newEnd });
+      } else {
+        this.$el.style.left = '';
+      }
+    },
+    entryMouseDown(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.$store.dispatch('startDrag');
+      this.startY = event.y;
+      this.$el.style.pointerEvents = 'none';
+      this.dragging = true;
+      this.dayMoved = this.getMomentFromDayDom(this.getDayFromMouseEvent(event));
+      this.entriesForDayMoved = this.getEntriesForDayExceptSelf(this.dayMoved);
+      // this.timeConstraints = this.$store.getters.dragConstraints(this.entryKey);
+      window.addEventListener('mousemove', this.onMouseMoveForMove);
+      window.addEventListener('mouseup', this.onMouseUp);
+    },
+    onMouseMoveForMove(event) {
+      this.dragOffsetY = this.startY - event.y;
+      const dayDom = this.getDayFromMouseEvent(event);
+      const newDayMoved = this.getMomentFromDayDom(dayDom);
+      const slotDiff = Math.floor(this.dragOffsetY / this.slotHeight) * -1;
+      const timelineEntry = event.path.filter(e => e.classList && e.classList.contains('timeline-entry')).pop();
+      this.newStart = moment(this.entry.start).add(slotDiff * 15, 'minutes');
+      this.newStart.date(newDayMoved.date()).month(newDayMoved.month()).year(newDayMoved.year());
+      this.newEnd = moment(this.entry.end).add(slotDiff * 15, 'minutes');
+      this.newEnd.date(newDayMoved.date()).month(newDayMoved.month()).year(newDayMoved.year());
+      if (newDayMoved.days() !== this.dayMoved.days()) {
+        this.entriesForDayMoved = this.getEntriesForDayExceptSelf(newDayMoved);
+        this.dayMoved = newDayMoved;
+      }
+      if (timelineEntry && !this.doesOverlap()) {
+        const newStartRow = this.rowStart + slotDiff;
+        const newEndRow = this.rowEnd + slotDiff;
+        this.$el.style['grid-row'] = `${newStartRow} / ${newEndRow}`;
+        console.log(newDayMoved.diff(this.entry.start, 'days'));
+        const dayPxOffset = Math.floor((newDayMoved.diff(this.entry.start, 'hours') / 24)) * dayDom.offsetWidth; // eslint-disable-line max-len
+        this.$el.style.left = `${dayPxOffset}px`;
+      }
+    },
+    /**
+     * gets hit day dom element from mouse event
+     * @returns {Object} dom element
+     */
+    getDayFromMouseEvent(event) {
+      return event.path.filter(e => e.classList && e.classList.contains('day')).pop();
+    },
+    /**
+     * gets moment from day dom element
+     * @returns {Object} moment
+     */
+    getMomentFromDayDom(dayEle) {
+      return moment()
+        .date(dayEle.getAttribute('data-day'))
+        .month(dayEle.getAttribute('data-month'))
+        .year(dayEle.getAttribute('data-year'));
+    },
+    /**
+     * get all entries for a day except self
+     * @returns {Object[]} array of entries
+     */
+    getEntriesForDayExceptSelf(day) {
+      return this.$store.getters.entriesForDay(day).filter(e => e.key !== this.entryKey);
+    },
+    doesOverlap() {
+      return this.entriesForDayMoved.some(other =>
+        other.start.isBefore(this.newEnd)
+          && other.end.isAfter(this.newStart));
     },
   },
 };
@@ -101,6 +180,9 @@ export default {
   box-sizing: border-box;
   padding-bottom: 2px;
   z-index: 1;
+  position: relative;
+  left: 0;
+  transition: left 0.2s ease-in-out;
 }
 
 .entry {
@@ -114,12 +196,16 @@ export default {
   grid-template-rows: auto 6px;
   grid-template-columns: 1fr;
   height: 100%;
-  transition: box-shadow 0.3s ease-in-out;
+  cursor: pointer;
 }
 
 .entry--dragging {
   opacity: 0.85;
   box-shadow: $shadow;
+}
+
+.entry--moving {
+  cursor: move;
 }
 
 .entry__info {

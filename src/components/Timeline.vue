@@ -10,10 +10,11 @@
       </div>
     </div>
     <entry v-for="(entry, index) in entriesForDay(day)" 
-      :key="index"
+      :key="entry.key"
       :entryKey="entry.key"
       v-bind="rowSpanForEntry(entry)"
-      :slotHeight="slotHeightInPx">
+      :slotHeight="slotHeightInPx"
+      >
     </entry>
   </div>
 </template>
@@ -128,6 +129,7 @@ export default {
   display: grid;
   grid-template-columns: 1fr;
   background-color: #fff;
+  position: relative;
 }
 
 .timeline-entry {

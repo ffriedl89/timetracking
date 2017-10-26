@@ -1,5 +1,5 @@
 <template>
-  <div class="day">
+  <div class="day" :data-day="day.date()" :data-month="day.month()" :data-year="day.year()">
     <header class="day__header">{{day | moment("dddd, MMM Do YYYY")}}</header>
     <div class="day__content" >
       <timeline slot="timeline" :showLabels="showLabels" :day="day"/>
