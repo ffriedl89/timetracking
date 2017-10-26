@@ -127,6 +127,7 @@ export default {
 .timeline {
   display: grid;
   grid-template-columns: 1fr;
+  background-color: #fff;
 }
 
 .timeline-entry {

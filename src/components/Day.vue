@@ -43,7 +43,7 @@ export default {
 }
 
 .day__header {
-  background-color: $bg-color;
+  background-color: #fff;
   border-bottom: 1px solid $light-color;
   padding: 1rem 0.5rem;
   white-space: nowrap;
