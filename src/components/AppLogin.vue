@@ -25,16 +25,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../scss/variables';
   .page {
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #333;
+    background-color: $dark-color;
   }
   
   h2 {
-    color: #fefefe;
+    color: $gray-light;
   }
 
   .login {

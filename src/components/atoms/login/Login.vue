@@ -43,7 +43,9 @@ export default {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+  @import '../../../scss/variables';
+
   .avatar {
     width: 2.5rem;
     margin: 0.5rem;
@@ -63,7 +65,7 @@ export default {
   }
 
   .hovermenu__group {
-    background-color: #333;
+    background-color: $dark-color;
     color: #fff;
     visibility: hidden;
     opacity: 0;
