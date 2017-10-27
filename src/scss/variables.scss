@@ -1,9 +1,13 @@
 $gray-light: #FBFBFB;
 $gray-dark: #999;
-$green: #4fac27;
 
-$btnColor: $green;
-$btnHoverColor: darken($btnColor, 10%);
+$dark-color: #105358;
+$light-color: #089c77;
+$accent-color: #fe6c4b;
+$bg-color: #e4dedf;
+
+$btnColor: $light-color;
+$btnHoverColor: darken($btnColor, 5%);
 
 $shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
 $shadowHover: 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px -1px rgba(0,0,0,0.3);

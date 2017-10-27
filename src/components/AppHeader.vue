@@ -1,9 +1,6 @@
 <template>
   <header class="appheader">
     <img class="logo" src="../assets/logo.svg" alt="">
-    <!-- <h1>This is the new timetracking!</h1>
-    <p>Its much better than Excel!</p>
-    <btn text="TestBtn"></btn> -->
     <login class="login"></login>
   </header>
 </template>
@@ -21,16 +18,18 @@ export default {
 };
 </script>
 
-<style lang="css">
+<style lang="scss" scoped>
+  @import '../scss/variables';
+
   .appheader {
-    width: 100vw; 
     height: 3.5rem;
-    background-color: #333;
-    border-bottom: 1px solid #373737;
+    background-color: $dark-color;
+    border-bottom: 1px solid darken($dark-color, 5%);
     display: flex;
     justify-content: space-between;
     margin-bottom: 0.5rem;
-    box-shadow: rgba(0, 0, 0, 0.5) 0 2px 2px;
+    box-shadow: $shadow;
+    box-sizing: border-box;
   }
 
   .logo {

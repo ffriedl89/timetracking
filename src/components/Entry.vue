@@ -2,7 +2,7 @@
   <div class="entry-wrapper" ref="wrapper" :style="styleObject">
     <div class="entry" :class="{'entry--dragging': dragging}">
       <div class="entry__info">
-        {{entry.start.format('HH:mm:ss')}} - {{entry.end.format('HH:mm:ss')}}
+        {{entry.start.format('HH:mm:ss')}} - {{newEnd ? newEnd.format('HH:mm:ss') : entry.end.format('HH:mm:ss')}}
       </div>
       <div class="entry__handle" @mousedown="onMouseDown" ref="resizeHandle" >
       </div>
@@ -100,17 +100,21 @@ export default {
   grid-column: 1;
   box-sizing: border-box;
   padding-bottom: 2px;
+  z-index: 1;
 }
 
 .entry {
-  background-color: $green;
+  box-sizing: border-box;
+  border-radius: 2px;
+  background-color: $light-color;
+  border: 1px solid darken($light-color, 5%);
   color: #fff;
   font-size: 0.6875rem;
   display: grid;
   grid-template-rows: auto 6px;
   grid-template-columns: 1fr;
   height: 100%;
-  transition: box-shadow 0.3s ease-in-out; 
+  transition: box-shadow 0.3s ease-in-out;
 }
 
 .entry--dragging {
