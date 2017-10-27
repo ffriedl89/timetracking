@@ -1,7 +1,9 @@
 <template>
   <div id="app">
-    <router-view name="header"></router-view>
-    <router-view></router-view>
+    <transition name="header-transition">
+      <router-view name="header"></router-view>
+    </transition>
+    <router-view class="view"></router-view>
   </div>
 </template>
 
@@ -26,4 +28,5 @@ body {
   margin: 0;
   padding: 0;
 }
+
 </style>

@@ -30,7 +30,7 @@ export default new Router({
       path: '/login',
       name: 'Login',
       components: {
-        default: AppLogin,
+        header: AppLogin,
       },
     },
   ],
