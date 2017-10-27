@@ -28,7 +28,6 @@ export default {
       return this.loggedIn ? this.user.displayName : '';
     },
     avatar() {
-      console.log(this.user);
       return this.user && this.user.photoURL ? this.user.photoURL : '';
     },
   },

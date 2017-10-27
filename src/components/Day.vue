@@ -32,20 +32,23 @@ export default {
 @import '../scss/variables';
 
 .day {
-  border-top: 5px solid $green;
+  border-top: 5px solid $light-color;
   min-height: 20vh;
   display: grid;
-  grid-template-rows: 80px 1fr;
+  grid-template-rows: auto 1fr;
 }
 
 .day:not(:last-child) {
-  border-right: 1px solid $gray-dark;
+  border-right: 1px solid $dark-color;
 }
 
 .day__header {
-  background-color: $gray-light;
-  border-bottom: 1px solid $green;
+  background-color: #fff;
+  border-bottom: 1px solid $light-color;
   padding: 1rem 0.5rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 </style>
 

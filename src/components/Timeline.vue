@@ -41,13 +41,13 @@ export default {
     startTime: {
       type: Object,
       default() {
-        return moment('08:00', 'HH:mm');
+        return moment('06:00', 'HH:mm');
       },
     },
     endTime: {
       type: Object,
       default() {
-        return moment('18:00', 'HH:mm');
+        return moment('19:00', 'HH:mm');
       },
     },
     showLabels: {
@@ -94,7 +94,7 @@ export default {
       const startDate = moment(this.day).hours(start.hours()).minutes(start.minutes());
       this.$store.dispatch('addEntry', {
         start: startDate,
-        end: moment(startDate).add(30, 'minutes'),
+        end: moment(startDate).add(15, 'minutes'),
         issue: 'UX-1231',
         comment: 'test 123123',
       });
@@ -127,6 +127,7 @@ export default {
 .timeline {
   display: grid;
   grid-template-columns: 1fr;
+  background-color: #fff;
 }
 
 .timeline-entry {
@@ -138,7 +139,7 @@ export default {
 }
 
 .timeline:not(.timeline--dragging) .timeline-entry:hover {
-  background-color: lighten($green, 30%);
+  background-color: lighten($light-color, 5%);
   color: #fff;
 }
 
@@ -147,5 +148,6 @@ export default {
   width: 2.625rem;
   padding-left: 0.25rem;
   line-height: 1.5rem;
+  font-size: 0.875rem;
 }
 </style>
