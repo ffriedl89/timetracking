@@ -7,6 +7,7 @@
           <a v-on:click="logout">Logout</a>
         </div>
       </div>
+    <!-- TODO: refactor menu as we will need more entries here -->
     </div>
     <button v-else v-on:click="login">Login</button>
   </div>
