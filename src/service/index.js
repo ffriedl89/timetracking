@@ -69,11 +69,11 @@ class Service {
   }
 
   /**
-   * Adds a timeentry to the user spaced database in firebase
+   * Adds or updates a timeentry to the user spaced database in firebase
    * @param {timeentry} entry
    */
-  addEntry(entry) {
-    const entryKey = this.dbRef.child('entries').push().key;
+  addOrUpdateEntry(entry) {
+    const entryKey = entry.key || this.dbRef.child('entries').push().key;
     const payload = {
       ...entry,
       key: entryKey,
