@@ -21,7 +21,7 @@
 
 <script>
 import moment from 'moment';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import Entry from './Entry';
 
 export default {
@@ -60,10 +60,12 @@ export default {
    * computed props
    */
   computed: {
+    ...mapState({
+      slotStepTime: state => state.entries.slotStepTime,
+      isDragging: state => state.dragdrop.isDragging,
+    }),
     ...mapGetters([
       'entriesForDay',
-      'slotStepTime',
-      'isDragging',
     ]),
     diff() {
       return this.endTime.diff(this.startTime, 'hours');

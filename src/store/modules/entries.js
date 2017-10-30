@@ -12,7 +12,6 @@ const state = {
 
 // getters
 const getters = {
-  entries: s => s.entries,
   entriesForDay: s => day => s.entries.filter(e =>
     e.start.date() === day.date()
     && e.start.month() === day.month()
@@ -27,7 +26,6 @@ const getters = {
     return 0;
   }),
   entryByKey: s => key => s.entries.find(e => e.key === key),
-  slotStepTime: s => s.slotStepTime,
   dragConstraints: (state, getters) => (key) => {
     /**
      * get entry

@@ -6,11 +6,6 @@ const state = {
   isDragging: false,
 };
 
-// getters
-const getters = {
-  isDragging: s => s.isDragging,
-};
-
 // actions
 const actions = {
   startDrag({ commit }) {
@@ -33,7 +28,6 @@ const mutations = {
 
 export default {
   state,
-  getters,
   actions,
   mutations,
 };
