@@ -1,18 +1,23 @@
 <template>
   <header class="appheader">
     <img class="logo" src="../assets/logo.svg" alt="">
-    <login class="login"></login>
+    <app-menu>
+      <router-link to="settings">Settings</router-link>
+      <login />
+    </app-menu>
   </header>
 </template>
 
 <script>
 import Btn from './atoms/btn/Btn';
+import Menu from './atoms/menu/Menu';
 import Login from './atoms/login/Login';
 
 export default {
   name: 'app-header',
   components: {
     Btn,
+    'app-menu': Menu,
     Login,
   },
 };
