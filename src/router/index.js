@@ -28,18 +28,19 @@ export default new Router({
       beforeEnter: checkLoggedin,
     },
     {
-      path: '/login',
-      name: 'Login',
-      components: {
-        header: AppLogin,
-      },
-    },
-    {
       path: '/settings',
       name: 'Settings',
       components: {
         header: AppHeader,
         default: Settings,
+      },
+      beforeEnter: checkLoggedin,
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      components: {
+        header: AppLogin,
       },
     },
   ],
