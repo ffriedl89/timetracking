@@ -111,6 +111,9 @@ class Service {
       .then((snapshot) => {
         // merge to array
         const snapshotValue = snapshot.val();
+        if (!snapshotValue) {
+          return [];
+        }
         return Object.keys(snapshotValue).map(key => snapshotValue[key]);
       })
       .then(entries => entries.map(entry => Service.deserializeEntry(entry)))
