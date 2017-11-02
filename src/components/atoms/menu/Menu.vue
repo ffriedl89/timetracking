@@ -10,7 +10,7 @@
         <circle cx="90" cy="80" r="7.5" stroke-width="0" />
       </svg>
     </button>
-    <div class="menu__foldout" v-bind:class="{ isActive: open }">
+    <div class="menu__foldout" v-bind:class="{ isActive: open }" v-on:click="slotClicked">
       <slot></slot>
     </div>
   </div>
@@ -26,6 +26,9 @@ export default {
   methods: {
     toggleMenu() {
       this.open = !this.open;
+    },
+    slotClicked() {
+      this.open = false;
     },
   },
 };

@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import AppMain from '@/components/AppMain';
 import AppHeader from '@/components/AppHeader';
 import AppLogin from '@/components/AppLogin';
+import Settings from '@/components/Settings';
 import Service from '@/service';
 
 Vue.use(Router);
@@ -31,6 +32,14 @@ export default new Router({
       name: 'Login',
       components: {
         header: AppLogin,
+      },
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      components: {
+        header: AppHeader,
+        default: Settings,
       },
     },
   ],
