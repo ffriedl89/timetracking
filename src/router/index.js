@@ -8,7 +8,7 @@ import Service from '@/service';
 
 Vue.use(Router);
 
-const checkLoggedin = (to, from, next) => {
+const checkloggedin = (to, from, next) => {
   if (!Service.userKey) {
     next('/login');
     return;
@@ -25,7 +25,7 @@ export default new Router({
         default: AppMain,
         header: AppHeader,
       },
-      beforeEnter: checkLoggedin,
+      beforeEnter: checkloggedin,
     },
     {
       path: '/settings',
@@ -34,7 +34,7 @@ export default new Router({
         header: AppHeader,
         default: Settings,
       },
-      beforeEnter: checkLoggedin,
+      beforeEnter: checkloggedin,
     },
     {
       path: '/login',
