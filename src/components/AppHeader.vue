@@ -2,6 +2,7 @@
   <header class="appheader">
     <img class="logo" src="../assets/logo.svg" alt="">
     <app-menu>
+      <router-link to="/">Home</router-link>
       <router-link to="settings">Settings</router-link>
       <login />
     </app-menu>
