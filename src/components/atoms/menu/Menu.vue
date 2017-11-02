@@ -2,9 +2,12 @@
   <div class="menu">
     <button class="menu__btn" v-on:click="toggleMenu" >
       <svg viewBox="0 0 100 100" class="menu__btn__icon" v-bind:class="{ isActive: open }">
-        <path d="M10 20, 90 20" stroke-width="13" stroke-linecap="round" />
-        <path d="M10 50, 90 50" stroke-width="13" stroke-linecap="round" />
-        <path d="M10 80, 90 80" stroke-width="13" stroke-linecap="round" />
+        <path d="M10 20, 90 20" stroke-width="15" stroke-linecap="round" />
+        <path d="M10 50, 90 50" stroke-width="15" stroke-linecap="round" />
+        <path d="M10 80, 90 80" stroke-width="15" stroke-linecap="round" />
+        <circle cx="90" cy="20" r="7.5" stroke-width="0" />
+        <circle cx="90" cy="50" r="7.5" stroke-width="0" />
+        <circle cx="90" cy="80" r="7.5" stroke-width="0" />
       </svg>
     </button>
     <div class="menu__foldout" v-bind:class="{ isActive: open }">
@@ -54,6 +57,25 @@ export default {
 
     path {
       stroke: $gray-light;
+      transition: transform 125ms ease-in-out;
+      transform: scaleX(0);
+      transform-origin: right;
+    }
+
+    path:nth-child(2) {
+      transition-delay: 30ms;
+    }
+
+    path:nth-child(3) {
+      transition-delay: 60ms;
+    }
+
+    &.isActive path {
+      transform: scaleX(1);
+    }
+
+    circle {
+      fill: $gray-light
     }
   }
 
@@ -64,7 +86,8 @@ export default {
     z-index: 90;
     transform: translateX(100%);
     transition: transform 150ms ease-out;
-
+    transition-delay: 80ms;
+    
     &.isActive {
       transform: translateX(0);
     }
