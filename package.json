@@ -19,6 +19,7 @@
     "firebase": "^4.5.0",
     "moment": "^2.18.1",
     "pretty-format": "^21.2.1",
+    "request": "^2.83.0",
     "vue": "^2.4.4",
     "vue-moment": "^2.0.2",
     "vue-router": "^2.8.1",

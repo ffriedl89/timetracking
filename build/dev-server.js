@@ -51,6 +51,18 @@ Object.keys(proxyTable).forEach(function (context) {
   app.use(proxyMiddleware(options.filter || context, options))
 })
 
+const request = require('request');
+app.use('/rest/*', (req, res, next) => {
+  request({
+    method: 'GET',
+    url: `${req.headers['x-proxy-to']}${req.originalUrl}`,
+    headers: {
+      authorization: req.headers.authorization,
+    },
+  })
+  .pipe(res);
+});
+
 // handle fallback for HTML5 history API
 app.use(require('connect-history-api-fallback')())
 
@@ -60,6 +72,7 @@ app.use(devMiddleware)
 // enable hot-reload and state-preserving
 // compilation error display
 app.use(hotMiddleware)
+
 
 // serve pure static assets
 var staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)

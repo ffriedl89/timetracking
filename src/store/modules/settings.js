@@ -19,6 +19,7 @@ const state = {
     url: '',
     user: '',
     password: '',
+    auth: '',
   }, loadKey('jira')),
 };
 
@@ -39,7 +40,7 @@ const actions = {
 const mutations = {
   [types.SETTINGS_SAVE_JIRA](s, data) {
     Vue.set(s.jirasettings, 'url', data.url);
-    Vue.set(s.jirasettings, 'auth', data.aut);
+    Vue.set(s.jirasettings, 'auth', data.auth);
     saveKey('jira', data);
   },
 };

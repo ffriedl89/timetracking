@@ -7,17 +7,18 @@ const JiraService = {
     const opts = {
       headers: new Headers({
         Authorization: `Basic ${j.auth}`,
+        'X-Proxy-To': j.url,
       }),
       cache: 'default',
       credentials: 'include',
       mode: 'cors',
     };
-    return window.fetch(`${j.url}/rest/api/2/${sanpath}`, opts);
+    return window.fetch(`/rest/api/2/${sanpath}`, opts)
+      .then(res => res.json());
   },
 
   testConnection() {
-    return JiraService.request('myself')
-      .then(e => console.log('e', e));
+    return JiraService.request('myself');
   },
 };
 

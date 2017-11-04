@@ -19,6 +19,7 @@
       <p v-if="jira.auth">Authorization key present</p>
       <button v-on:click="savejira">Save</button>
       <button v-on:click="testjira">Test connection</button>
+      <p v-if="testresponse"> {{ testresponse }}</p>
     </fieldset>
   </div>
 </template>
@@ -28,6 +29,11 @@ import JiraService from '../services/jira';
 
 export default {
   name: 'settings',
+  data() {
+    return {
+      testresponse: '',
+    };
+  },
   computed: {
     jira: {
       get() {
@@ -40,8 +46,13 @@ export default {
       this.$store.dispatch('savejira', this.jira);
     },
     testjira() {
-      // TODO: make a dummy test call to check if auth is working
-      JiraService.testConnection();
+      JiraService.testConnection()
+        .then((d) => {
+          this.testresponse = `You are logged in as ${d.displayName}`;
+        })
+        .catch((err) => {
+          this.testresponse = `Failed to connect ${err}`;
+        });
     },
   },
 };
