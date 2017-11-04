@@ -27,7 +27,11 @@ class Service {
         this.userKey = user.uid;
         this.dbRef = database().ref(this.userKey);
         this.runQueue();
-        router.push({ path: '/' });
+        if (this.nextRoute) {
+          router.push({ path: this.nextRoute });
+        } else {
+          router.push({ path: '/' });
+        }
       } else {
         store.dispatch('logout');
         this.userKey = undefined;
@@ -50,6 +54,14 @@ class Service {
 
   logout() {  // eslint-disable-line
     return auth().signOut();
+  }
+
+  /**
+   * Sets the next route to send to the correct route after authStateChange
+   * @param {function} next - router next callback
+   */
+  setNextRoute(next) {
+    this.nextRoute = next.path;
   }
 
   static serializeEntry(entry) { //eslint-disable-line

@@ -10,6 +10,7 @@ Vue.use(Router);
 
 const checkloggedin = (to, from, next) => {
   if (!Service.userKey) {
+    Service.setNextRoute(to);
     next('/login');
     return;
   }
