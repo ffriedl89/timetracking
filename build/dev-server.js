@@ -54,7 +54,7 @@ Object.keys(proxyTable).forEach(function (context) {
 const request = require('request');
 app.use('/rest/*', (req, res, next) => {
   request({
-    method: 'GET',
+    method: req.method,
     url: `${req.headers['x-proxy-to']}${req.originalUrl}`,
     headers: {
       authorization: req.headers.authorization,
