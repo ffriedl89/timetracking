@@ -15,7 +15,7 @@ const saveKey = (key, data) => {
 };
 
 const state = {
-  jiraSettings: Object.assign({
+  jirasettings: Object.assign({
     url: '',
     user: '',
     password: '',
@@ -23,13 +23,13 @@ const state = {
 };
 
 const getters = {
-  jiraSettings: s => s.jiraSettings,
+  jirasettings: s => s.jirasettings,
 };
 
 const actions = {
   savejira({ commit }, data) {
     const d = {
-      url: `${data.url}/rest/api/2/`,
+      url: data.url,
       auth: btoa(`${data.user}:${data.password}`),
     };
     commit(types.SETTINGS_SAVE_JIRA, d);
@@ -38,8 +38,8 @@ const actions = {
 
 const mutations = {
   [types.SETTINGS_SAVE_JIRA](s, data) {
-    Vue.set(s.jiraSettings, 'url', data.url);
-    Vue.set(s.jiraSettings, 'auth', data.aut);
+    Vue.set(s.jirasettings, 'url', data.url);
+    Vue.set(s.jirasettings, 'auth', data.aut);
     saveKey('jira', data);
   },
 };

@@ -31,7 +31,7 @@ export default {
   computed: {
     jira: {
       get() {
-        return this.$store.state.settings.jiraSettings;
+        return this.$store.state.settings.jirasettings;
       },
     },
   },
@@ -68,6 +68,7 @@ export default {
     border-radius: 3px;
     padding: 0.3rem 0.5rem;
     border: 1px solid $gray-light;
+    width: 15rem;
   }
 </style>
 
