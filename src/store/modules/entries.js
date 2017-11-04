@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import moment from 'moment';
 import * as types from '../mutation-types';
-import Service from '../../service';
+import FirebaseService from '../../services/firebase';
 
 // initial state
 const state = {
@@ -68,7 +68,7 @@ const getters = {
 // actions
 const actions = {
   loadWeekEntries(_, { start, end }) {
-    Service.loadEntries(start, end);
+    FirebaseService.loadEntries(start, end);
   },
 
   populateEntries({ commit, state }, entries) { // eslint-disable-line
@@ -78,7 +78,7 @@ const actions = {
   },
 
   addEntry({ commit }, entry) {
-    Service.addOrUpdateEntry({
+    FirebaseService.addOrUpdateEntry({
       ...entry,
     })
       .then((dbEntry) => {
@@ -92,7 +92,7 @@ const actions = {
   },
   updateEntry({ state, commit }, { key, end }) {
     const entry = state.entries.find(e => e.key === key);
-    Service.addOrUpdateEntry({
+    FirebaseService.addOrUpdateEntry({
       ...entry,
       end,
     }).then((dbEntry) => {

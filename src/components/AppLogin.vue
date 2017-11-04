@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import Service from '../service';
+import FirebaseService from '../services/firebase';
 import Btn from './atoms/btn/Btn';
 
 export default {
@@ -18,7 +18,7 @@ export default {
   },
   methods: {
     login() {
-      Service.login();
+      FirebaseService.login();
     },
   },
 };

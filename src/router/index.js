@@ -4,13 +4,13 @@ import AppMain from '@/components/AppMain';
 import AppHeader from '@/components/AppHeader';
 import AppLogin from '@/components/AppLogin';
 import Settings from '@/components/Settings';
-import Service from '@/service';
+import FirebaseService from '@/services/firebase';
 
 Vue.use(Router);
 
 const checkloggedin = (to, from, next) => {
-  if (!Service.userKey) {
-    Service.setNextRoute(to);
+  if (!FirebaseService.userKey) {
+    FirebaseService.setNextRoute(to);
     next('/login');
     return;
   }

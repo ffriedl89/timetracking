@@ -7,3 +7,5 @@ export const LOGOUT = 'LOGOUT';
 
 export const START_DRAG_ENTRY_END = 'START_DRAG_ENTRY_END';
 export const END_DRAG_ENTRY_END = 'END_DRAG_ENTRY_END';
+
+export const SETTINGS_SAVE_JIRA = 'SETTINGS_SAVE_JIRA';

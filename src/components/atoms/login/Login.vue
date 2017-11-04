@@ -5,7 +5,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import Service from '../../../service';
+import FirebaseService from '../../../services/firebase';
 
 export default {
   computed: {
@@ -21,10 +21,10 @@ export default {
   },
   methods: {
     login() {
-      Service.login();
+      FirebaseService.login();
     },
     logout() {
-      Service.logout();
+      FirebaseService.logout();
     },
   },
 };

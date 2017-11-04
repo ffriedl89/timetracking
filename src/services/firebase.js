@@ -12,7 +12,7 @@ const SETTINGS = {
   messagingSenderId: '657882135042',
 };
 
-class Service {
+class FirebaseService {
   constructor() {
     this.app = initializeApp(SETTINGS);
     this.providers = {
@@ -91,7 +91,7 @@ class Service {
       key: entryKey,
     };
     const updates = {};
-    updates[`entries/${entryKey}`] = Service.serializeEntry(payload);
+    updates[`entries/${entryKey}`] = FirebaseService.serializeEntry(payload);
     return this.dbRef.update(updates)
       .then(() => payload);
   }
@@ -128,9 +128,9 @@ class Service {
         }
         return Object.keys(snapshotValue).map(key => snapshotValue[key]);
       })
-      .then(entries => entries.map(entry => Service.deserializeEntry(entry)))
+      .then(entries => entries.map(entry => FirebaseService.deserializeEntry(entry)))
       .then(entries => store.dispatch('populateEntries', entries));
   }
 }
 
-export default new Service();
+export default new FirebaseService();
