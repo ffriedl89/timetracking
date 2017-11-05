@@ -1,10 +1,10 @@
 <template>
   <div class="entry-wrapper" ref="wrapper" :style="styleObject">
-    <div class="entry" :class="{'entry--dragging': dragging}">
+    <div class="entry" :class="{'entry--dragging': dragging}" v-on:click="onClick">
       <div class="entry__info">
         {{entry.start.format('HH:mm:ss')}} - {{newEnd ? newEnd.format('HH:mm:ss') : entry.end.format('HH:mm:ss')}}
       </div>
-      <div class="entry__handle" @mousedown="onMouseDown" ref="resizeHandle" >
+      <div class="entry__handle" @mousedown="onMouseDown" ref="resizeHandle">
       </div>
     </div>
   </div>
@@ -13,6 +13,7 @@
 <script>
 import moment from 'moment';
 import Vue from 'vue';
+import modal from './modals/EntryModal';
 
 export default {
   name: 'entry',
@@ -87,6 +88,14 @@ export default {
       window.removeEventListener('mouseup', this.onMouseUp);
       this.$store.dispatch('updateEntry', { key: this.entryKey, end: this.newEnd });
       this.dragging = false;
+    },
+    onClick() {
+      this.$store.dispatch('openModal', {
+        modal,
+        props: {
+          entry: this.entry,
+        },
+      });
     },
   },
 };

@@ -4,12 +4,18 @@
       <router-view name="header"></router-view>
     </transition>
     <router-view class="view"></router-view>
+    <modalcontainer />
   </div>
 </template>
 
 <script>
+import modalcontainer from './components/AppModalContainer';
+
 export default {
   name: 'app',
+  components: {
+    modalcontainer,
+  },
 };
 </script>
 
