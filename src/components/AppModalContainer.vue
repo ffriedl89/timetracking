@@ -1,7 +1,7 @@
 <template>
  <transition name="fade">
   <div class="modal__container" v-if="modal.open">
-    <component v-bind:is="modal.el" >
+    <component v-bind:is="modal.el" v-bind="modal.props" >
     </component>
   </div>
  </transition>

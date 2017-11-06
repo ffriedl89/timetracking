@@ -1,24 +1,45 @@
 <template>
-  <div class="modal">
-    <header class="modal__header">Issue: ...</header>
-    <div class="modal__main"></div>
+  <div class="modal" v-on:keydown.enter="onSave">
+    <header class="modal__header">Issue: {{entry.issue}}</header>
+    <div class="modal__main">
+      <div class="inputgroup">
+        <label for="issue">Issue</label>
+        <input name="issue" type="text" id="issue" autocomplete="off" v-model="entry.issue" />
+      </div>
+    </div>
     <div class="modal__footer">
       <btn v-on:click.native="onClose">Close</btn>
-      <btn>Save</btn>
+      <btn v-on:click.native="onSave">Save</btn>
     </div>
   </div>
 </template>
 
 <script>
 import btn from '../atoms/btn/Btn';
+import { sanitizeIssueNo } from '../../utils/jirautils';
 
 export default {
   components: {
     btn,
   },
   methods: {
+    onSave() {
+      this.$store.dispatch('updateEntry', {
+        key: this.entry.key,
+        issue: sanitizeIssueNo(this.entry.issue),
+      });
+      this.$store.dispatch('closeModal');
+    },
     onClose() {
       this.$store.dispatch('closeModal');
+    },
+    keyDown(e) {
+      console.log(e);
+    },
+  },
+  props: {
+    entry: {
+      type: Object,
     },
   },
 };

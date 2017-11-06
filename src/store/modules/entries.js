@@ -90,11 +90,18 @@ const actions = {
       key,
     });
   },
-  updateEntry({ state, commit }, { key, end }) {
+  updateEntry({ state, commit }, { key, end, issue }) {
     const entry = state.entries.find(e => e.key === key);
+
+    /**
+     * Combine update entry log
+     */
+    const updateEntry = {};
+    if (end) updateEntry.end = end;
+    if (issue) updateEntry.issue = issue;
     FirebaseService.addOrUpdateEntry({
       ...entry,
-      end,
+      ...updateEntry,
     }).then((dbEntry) => {
       commit(types.UPDATE_ENTRY, {
         ...dbEntry,

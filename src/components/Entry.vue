@@ -2,7 +2,8 @@
   <div class="entry-wrapper" ref="wrapper" :style="styleObject">
     <div class="entry" :class="{'entry--dragging': dragging}" v-on:click="onClick">
       <div class="entry__info">
-        {{entry.start.format('HH:mm:ss')}} - {{newEnd ? newEnd.format('HH:mm:ss') : entry.end.format('HH:mm:ss')}}
+        {{entry.start.format('HH:mm')}} - {{newEnd ? newEnd.format('HH:mm') : entry.end.format('HH:mm')}}
+        <span class="entry__issue">{{entry.issue}}</span>
       </div>
       <div class="entry__handle" @mousedown="onMouseDown" ref="resizeHandle">
       </div>
@@ -136,9 +137,14 @@ export default {
   padding: 0.125rem 1rem 0;
 }
 
+.entry__issue {
+  white-space: nowrap;
+}
+
 .entry__handle {
   cursor: ns-resize;
   grid-row: 2;
+  background-color: $dark-color;
 }
 
 .entry__handle svg {
