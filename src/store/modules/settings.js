@@ -31,6 +31,7 @@ const actions = {
   savejira({ commit }, data) {
     const d = {
       url: data.url,
+      user: data.user,
       auth: btoa(`${data.user}:${data.password}`),
     };
     commit(types.SETTINGS_SAVE_JIRA, d);

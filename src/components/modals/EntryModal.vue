@@ -5,6 +5,11 @@
       <div class="inputgroup">
         <label for="issue">Issue</label>
         <input name="issue" type="text" id="issue" autocomplete="off" v-model="entry.issue" />
+        <combobox
+          v-model="entry.issue"
+          v-bind:options="options"
+          v-bind:optionelement="issue",
+        />
       </div>
     </div>
     <div class="modal__footer">
@@ -15,12 +20,16 @@
 </template>
 
 <script>
+import JiraService from '../../services/jira';
 import btn from '../atoms/btn/Btn';
+import combobox from '../atoms/combobox/Combobox';
+import issueComponent from '../atoms/issue/Issue';
 import { sanitizeIssueNo } from '../../utils/jirautils';
 
 export default {
   components: {
     btn,
+    combobox,
   },
   methods: {
     onSave() {
@@ -33,6 +42,9 @@ export default {
     onClose() {
       this.$store.dispatch('closeModal');
     },
+    onChange(e) {
+      console.log(e);
+    },
     keyDown(e) {
       console.log(e);
     },
@@ -41,6 +53,21 @@ export default {
     entry: {
       type: Object,
     },
+  },
+  data() {
+    return {
+      issue: issueComponent,
+      options: [],
+    };
+  },
+  created() {
+    JiraService
+      .getCurrentIssuesForUser()
+      .then((res) => {
+        if (res.issues) {
+          this.options = res.issues;
+        }
+      });
   },
 };
 </script>
