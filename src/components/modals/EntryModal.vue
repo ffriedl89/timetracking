@@ -65,8 +65,12 @@ export default {
       .getCurrentIssuesForUser()
       .then((res) => {
         if (res.issues) {
-          this.options = res.issues;
-          console.log(this.options);
+          this.options = res.issues
+            .map((el) => {
+              const e = el;
+              e.issuekey = el.key;
+              return e;
+            });
         }
       });
   },

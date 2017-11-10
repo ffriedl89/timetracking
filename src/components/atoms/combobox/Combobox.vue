@@ -1,7 +1,7 @@
 <template>
   <div>
     <input type="text" v-bind:value="value" v-on:input="$emit('input', $event.target.value)" />
-    <div class="options">
+    <div class="options" v-if="options.length">
       <span 
         v-for="(option, index) in options"
         v-bind:key="index"
@@ -10,6 +10,8 @@
         >
       </span>
     </div>
+    <!-- TODO: Loading distractor -->
+    <div v-else>Loading</div>
   </div>  
 
 </template>

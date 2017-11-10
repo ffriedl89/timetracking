@@ -1,15 +1,21 @@
 <template>
   <div>
-    hello
+    {{issuekey}}: {{fields.summary}}
   </div>
 </template>
 
 <script>
 export default {
+  props: {
+    fields: {
+      type: Object,
+    },
+    issuekey: {
+      type: String,
+    },
+  },
   data() {
-    return {
-
-    };
+    return {};
   },
   created() {
     console.log(this);
