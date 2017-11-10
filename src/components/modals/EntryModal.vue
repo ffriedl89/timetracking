@@ -8,7 +8,7 @@
         <combobox
           v-model="entry.issue"
           v-bind:options="options"
-          v-bind:optionelement="issue",
+          v-bind:optionelement="issue"
         />
       </div>
     </div>
@@ -66,6 +66,7 @@ export default {
       .then((res) => {
         if (res.issues) {
           this.options = res.issues;
+          console.log(this.options);
         }
       });
   },
