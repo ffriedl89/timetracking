@@ -96,7 +96,7 @@ export default {
       window.removeEventListener('mouseup', this.onMouseUp);
       this.dragging = false;
       this.$el.style.pointerEvents = '';
-      if (!this.doesOverlap()) {
+      if (!this.doesOverlap(this.newStart, this.newEnd)) {
         this.$store.dispatch('updateEntry', { key: this.entryKey, start: this.newStart, end: this.newEnd });
       } else {
         this.$el.style.left = '';
@@ -119,22 +119,31 @@ export default {
       this.dragOffsetY = this.startY - event.y;
       const dayDom = this.getDayFromMouseEvent(event);
       const newDayMoved = this.getMomentFromDayDom(dayDom);
-      const slotDiff = Math.floor(this.dragOffsetY / this.slotHeight) * -1;
       const timelineEntry = event.path.filter(e => e.classList && e.classList.contains('timeline-entry')).pop();
-      this.newStart = moment(this.entry.start).add(slotDiff * 15, 'minutes');
-      this.newStart.date(newDayMoved.date()).month(newDayMoved.month()).year(newDayMoved.year());
-      this.newEnd = moment(this.entry.end).add(slotDiff * 15, 'minutes');
-      this.newEnd.date(newDayMoved.date()).month(newDayMoved.month()).year(newDayMoved.year());
-      if (newDayMoved.days() !== this.dayMoved.days()) {
+      const slotDiff = Math.floor(this.dragOffsetY / this.slotHeight) * -1;
+      const tempStart = this.setMomentBySlotDiff(this.entry.start, newDayMoved, slotDiff);
+      const tempEnd = this.setMomentBySlotDiff(this.entry.end, newDayMoved, slotDiff);
+      if (tempStart.date() !== newDayMoved.date() || tempEnd.date() !== newDayMoved.date()) {
+        /**
+         * entry would move outside of day constraints
+         */
+        return;
+      }
+      if (newDayMoved.date() !== this.dayMoved.date()) {
         this.entriesForDayMoved = this.getEntriesForDayExceptSelf(newDayMoved);
         this.dayMoved = newDayMoved;
       }
-      if (timelineEntry && !this.doesOverlap()) {
+      if (timelineEntry && !this.doesOverlap(tempStart, tempEnd)) {
+        /**
+         * update newStart / newEnd if no overlaps are found
+         */
+        this.newStart = tempStart;
+        this.newEnd = tempEnd;
         const newStartRow = this.rowStart + slotDiff;
         const newEndRow = this.rowEnd + slotDiff;
         this.$el.style['grid-row'] = `${newStartRow} / ${newEndRow}`;
-        console.log(newDayMoved.diff(this.entry.start, 'days'));
-        const dayPxOffset = Math.floor((newDayMoved.diff(this.entry.start, 'hours') / 24)) * dayDom.offsetWidth; // eslint-disable-line max-len
+        console.log(this.newStart.diff(this.entry.start, 'hours') / 24);
+        const dayPxOffset = Math.floor(this.newStart.diff(this.entry.start, 'hours') / 24) * dayDom.offsetWidth; // eslint-disable-line max-len
         this.$el.style.left = `${dayPxOffset}px`;
       }
     },
@@ -162,10 +171,15 @@ export default {
     getEntriesForDayExceptSelf(day) {
       return this.$store.getters.entriesForDay(day).filter(e => e.key !== this.entryKey);
     },
-    doesOverlap() {
+    doesOverlap(start, end) {
       return this.entriesForDayMoved.some(other =>
-        other.start.isBefore(this.newEnd)
-          && other.end.isAfter(this.newStart));
+        other.start.isBefore(end)
+          && other.end.isAfter(start));
+    },
+    setMomentBySlotDiff(baseTime, newDay, diff) {
+      const temp = moment(newDay).seconds(0).milliseconds(0);
+      temp.hours(baseTime.hours()).minutes(baseTime.minutes()).add(diff * 15, 'minutes');
+      return temp;
     },
   },
 };
