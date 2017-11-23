@@ -42,13 +42,13 @@ export default {
     startTime: {
       type: Object,
       default() {
-        return moment('06:00', 'HH:mm');
+        return moment('00:00', 'HH:mm');
       },
     },
     endTime: {
       type: Object,
       default() {
-        return moment('19:00', 'HH:mm');
+        return moment('24:00', 'HH:mm');
       },
     },
     showLabels: {
