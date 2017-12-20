@@ -29,7 +29,6 @@ export default {
       },
       newStart: null,
       newEnd: null,
-      offsetFromEntryStartSlots: 0,
       dayMoved: null,
       entriesForDayMoved: [],
       dayWidth: 0,
