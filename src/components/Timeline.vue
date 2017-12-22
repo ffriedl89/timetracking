@@ -10,17 +10,18 @@
       </div>
     </div>
     <entry v-for="(entry, index) in entriesForDay(day)" 
-      :key="index"
+      :key="entry.key"
       :entryKey="entry.key"
       v-bind="rowSpanForEntry(entry)"
-      :slotHeight="slotHeightInPx">
+      :slotHeight="slotHeightInPx"
+      >
     </entry>
   </div>
 </template>
 
 <script>
 import moment from 'moment';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import Entry from './Entry';
 
 export default {
@@ -41,13 +42,13 @@ export default {
     startTime: {
       type: Object,
       default() {
-        return moment('06:00', 'HH:mm');
+        return moment('00:00', 'HH:mm');
       },
     },
     endTime: {
       type: Object,
       default() {
-        return moment('19:00', 'HH:mm');
+        return moment('24:00', 'HH:mm');
       },
     },
     showLabels: {
@@ -59,10 +60,12 @@ export default {
    * computed props
    */
   computed: {
+    ...mapState({
+      slotStepTime: state => state.entries.slotStepTime,
+      isDragging: state => state.dragdrop.isDragging,
+    }),
     ...mapGetters([
       'entriesForDay',
-      'slotStepTime',
-      'isDragging',
     ]),
     diff() {
       return this.endTime.diff(this.startTime, 'hours');
@@ -128,6 +131,7 @@ export default {
   display: grid;
   grid-template-columns: 1fr;
   background-color: #fff;
+  position: relative;
 }
 
 .timeline-entry {

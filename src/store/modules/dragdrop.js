@@ -6,34 +6,28 @@ const state = {
   isDragging: false,
 };
 
-// getters
-const getters = {
-  isDragging: s => s.isDragging,
-};
-
 // actions
 const actions = {
-  startDragEntryEnd({ commit }) {
-    commit(types.START_DRAG_ENTRY_END);
+  startDrag({ commit }) {
+    commit(types.START_DRAG);
   },
-  endDragEntryEnd({ commit }) {
-    commit(types.END_DRAG_ENTRY_END);
+  endDrag({ commit }) {
+    commit(types.END_DRAG);
   },
 };
 
 // mutations
 const mutations = {
-  [types.START_DRAG_ENTRY_END](state) {
+  [types.START_DRAG](state) {
     state.isDragging = true;
   },
-  [types.END_DRAG_ENTRY_END](state) {
+  [types.END_DRAG](state) {
     state.isDragging = false;
   },
 };
 
 export default {
   state,
-  getters,
   actions,
   mutations,
 };

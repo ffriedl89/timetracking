@@ -12,7 +12,6 @@ const state = {
 
 // getters
 const getters = {
-  entries: s => s.entries,
   entriesForDay: s => day => s.entries.filter(e =>
     e.start.date() === day.date()
     && e.start.month() === day.month()
@@ -27,7 +26,6 @@ const getters = {
     return 0;
   }),
   entryByKey: s => key => s.entries.find(e => e.key === key),
-  slotStepTime: s => s.slotStepTime,
   dragConstraints: (state, getters) => (key) => {
     /**
      * get entry
@@ -90,16 +88,17 @@ const actions = {
       key,
     });
   },
-  updateEntry({ state, commit }, { key, end }) {
+  updateEntry({ state, commit }, { key, start, end }) {
     const entry = state.entries.find(e => e.key === key);
     Service.addOrUpdateEntry({
       ...entry,
+      start,
       end,
     }).then((dbEntry) => {
       commit(types.UPDATE_ENTRY, {
         ...dbEntry,
       });
-      commit(types.END_DRAG_ENTRY_END);
+      commit(types.END_DRAG);
     });
   },
 };
