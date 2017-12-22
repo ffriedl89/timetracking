@@ -1,6 +1,6 @@
 <template>
-  <div class="entry-wrapper" ref="wrapper" :style="styleObject" @mousedown="entryMouseDown">
-    <div class="entry" :class="{'entry--dragging': dragging, 'entry--overlapping': overlapping}">
+  <div class="entry-wrapper" ref="wrapper" :class="{'entry--dragging': dragging }" :style="styleObject" @mousedown="entryMouseDown">
+    <div class="entry" :class="{'entry--overlapping': overlapping}">
       <div class="entry__info">
         {{newStart ? newStart.format('HH:mm:ss') : entry.start.format('HH:mm:ss')}} - {{newEnd ? newEnd.format('HH:mm:ss') : entry.end.format('HH:mm:ss')}}
       </div>
@@ -132,19 +132,15 @@ export default {
         const tempStart = this.setMomentBySlotDiff(this.entry.start, dayDiff, slotDiff);
         const tempEnd = this.setMomentBySlotDiff(this.entry.end, dayDiff, slotDiff);
         if (this.newStart && this.newStart.date() !== tempStart.date()) {
+          console.log('fetching new Days', tempStart.date(), this.newStart.date());
           this.entriesForDayMoved = this.getEntriesForDayExceptSelf(tempStart);
         }
         this.overlapping = this.doesOverlap(tempStart, tempEnd);
-        if (!this.overlapping) {
-          /**
-           * update newStart / newEnd if no overlaps are found
-           */
-          this.newStart = tempStart;
-          this.newEnd = tempEnd;
-        } else {
-          this.newStart = this.entry.start;
-          this.newEnd = this.entry.end;
-        }
+        /**
+          * update newStart / newEnd if no overlaps are found
+          */
+        this.newStart = tempStart;
+        this.newEnd = tempEnd;
       }
     },
     checkDayMovementConstraint(slotDiff) {
@@ -227,6 +223,10 @@ export default {
 }
 
 .entry--dragging {
+  z-index: 1000;
+}
+
+.entry--dragging .entry {
   opacity: 0.85;
   box-shadow: $shadow;
 }
