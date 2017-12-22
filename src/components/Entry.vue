@@ -134,15 +134,14 @@ export default {
         if (this.newStart && this.newStart.date() !== tempStart.date()) {
           this.entriesForDayMoved = this.getEntriesForDayExceptSelf(tempStart);
         }
-        if (!this.doesOverlap(tempStart, tempEnd)) {
-          this.overlapping = false;
+        this.overlapping = this.doesOverlap(tempStart, tempEnd);
+        if (!this.overlapping) {
           /**
            * update newStart / newEnd if no overlaps are found
            */
           this.newStart = tempStart;
           this.newEnd = tempEnd;
         } else {
-          this.overlapping = true;
           this.newStart = this.entry.start;
           this.newEnd = this.entry.end;
         }
@@ -159,7 +158,7 @@ export default {
     },
     /**
      * gets hit day dom element from mouse event
-     * @returns {Object} dom element
+     * @returns {Node} dom element
      */
     getDayFromMouseEvent(event) {
       return event.path.filter(e => e.classList && e.classList.contains('day')).pop();
@@ -183,8 +182,7 @@ export default {
     },
     doesOverlap(start, end) {
       return this.entriesForDayMoved.some(other =>
-        other.start.isBefore(end)
-          && other.end.isAfter(start));
+        other.start.isBefore(end) && other.end.isAfter(start));
     },
     setMomentBySlotDiff(baseTime, dayDiff, slotDiff) {
       const temp = moment(baseTime).seconds(0).milliseconds(0);
