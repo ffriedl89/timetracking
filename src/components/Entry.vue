@@ -1,6 +1,6 @@
 <template>
   <div class="entry-wrapper" ref="wrapper" :style="styleObject" @mousedown="entryMouseDown">
-    <div class="entry" :class="{'entry--dragging': dragging, 'entry--moving': moving}">
+    <div class="entry" :class="{'entry--dragging': dragging, 'entry--overlapping': overlapping}">
       <div class="entry__info">
         {{newStart ? newStart.format('HH:mm:ss') : entry.start.format('HH:mm:ss')}} - {{newEnd ? newEnd.format('HH:mm:ss') : entry.end.format('HH:mm:ss')}}
       </div>
@@ -20,17 +20,18 @@ export default {
     return {
       issue: 'UX-1231',
       startY: 0,
+      startX: 0,
       dragging: false,
-      moving: false,
+      overlapping: false,
       timeConstraints: {
         start: null,
         end: null,
       },
       newStart: null,
       newEnd: null,
-      offsetFromEntryStartSlots: 0,
       dayMoved: null,
       entriesForDayMoved: [],
+      dayWidth: 0,
     };
   },
   props: {
@@ -95,10 +96,13 @@ export default {
       window.removeEventListener('mousemove', this.onMouseMoveForMove);
       window.removeEventListener('mouseup', this.onMouseUp);
       this.dragging = false;
+      this.overlapping = false;
       this.$el.style.pointerEvents = '';
-      if (!this.doesOverlap(this.newStart, this.newEnd)) {
+      if (!this.entry.end.isSame(this.newEnd)
+        && !this.doesOverlap(this.newStart, this.newEnd)) {
         this.$store.dispatch('updateEntry', { key: this.entryKey, start: this.newStart, end: this.newEnd });
       } else {
+        this.$el.style['grid-row'] = `${this.rowStart} / ${this.rowEnd}`;
         this.$el.style.left = '';
       }
     },
@@ -107,45 +111,51 @@ export default {
       event.stopPropagation();
       this.$store.dispatch('startDrag');
       this.startY = event.y;
+      this.startX = event.x;
+      this.startXLeftOffset = event.layerX;
       this.$el.style.pointerEvents = 'none';
       this.dragging = true;
-      this.dayMoved = this.getMomentFromDayDom(this.getDayFromMouseEvent(event));
-      this.entriesForDayMoved = this.getEntriesForDayExceptSelf(this.dayMoved);
-      // this.timeConstraints = this.$store.getters.dragConstraints(this.entryKey);
+      this.dayWidth = document.querySelector('.day').offsetWidth;
+      this.entriesForDayMoved = this.getEntriesForDayExceptSelf(this.entry.start);
       window.addEventListener('mousemove', this.onMouseMoveForMove);
       window.addEventListener('mouseup', this.onMouseUp);
     },
     onMouseMoveForMove(event) {
-      this.dragOffsetY = this.startY - event.y;
-      const dayDom = this.getDayFromMouseEvent(event);
-      const newDayMoved = this.getMomentFromDayDom(dayDom);
-      const timelineEntry = event.path.filter(e => e.classList && e.classList.contains('timeline-entry')).pop();
-      const slotDiff = Math.floor(this.dragOffsetY / this.slotHeight) * -1;
-      const tempStart = this.setMomentBySlotDiff(this.entry.start, newDayMoved, slotDiff);
-      const tempEnd = this.setMomentBySlotDiff(this.entry.end, newDayMoved, slotDiff);
-      if (tempStart.date() !== newDayMoved.date() || tempEnd.date() !== newDayMoved.date()) {
-        /**
-         * entry would move outside of day constraints
-         */
-        return;
+      this.dragOffsetY = event.y - this.startY;
+      this.dragOffsetX = this.startXLeftOffset + (event.x - this.startX);
+      const slotDiff = Math.floor(this.dragOffsetY / this.slotHeight);
+      const dayDiff = Math.floor(this.dragOffsetX / this.dayWidth);
+
+      if (this.checkDayMovementConstraint(slotDiff)) {
+        this.$el.style['grid-row'] = `${this.rowStart + slotDiff} / ${this.rowEnd + slotDiff}`;
+        this.$el.style.left = `${this.dayWidth * dayDiff}px`;
+        const tempStart = this.setMomentBySlotDiff(this.entry.start, dayDiff, slotDiff);
+        const tempEnd = this.setMomentBySlotDiff(this.entry.end, dayDiff, slotDiff);
+        if (this.newStart && this.newStart.date() !== tempStart.date()) {
+          this.entriesForDayMoved = this.getEntriesForDayExceptSelf(tempStart);
+        }
+        if (!this.doesOverlap(tempStart, tempEnd)) {
+          this.overlapping = false;
+          /**
+           * update newStart / newEnd if no overlaps are found
+           */
+          this.newStart = tempStart;
+          this.newEnd = tempEnd;
+        } else {
+          this.overlapping = true;
+          this.newStart = this.entry.start;
+          this.newEnd = this.entry.end;
+        }
       }
-      if (newDayMoved.date() !== this.dayMoved.date()) {
-        this.entriesForDayMoved = this.getEntriesForDayExceptSelf(newDayMoved);
-        this.dayMoved = newDayMoved;
-      }
-      if (timelineEntry && !this.doesOverlap(tempStart, tempEnd)) {
-        /**
-         * update newStart / newEnd if no overlaps are found
-         */
-        this.newStart = tempStart;
-        this.newEnd = tempEnd;
-        const newStartRow = this.rowStart + slotDiff;
-        const newEndRow = this.rowEnd + slotDiff;
-        this.$el.style['grid-row'] = `${newStartRow} / ${newEndRow}`;
-        console.log(this.newStart.diff(this.entry.start, 'hours') / 24);
-        const dayPxOffset = Math.floor(this.newStart.diff(this.entry.start, 'hours') / 24) * dayDom.offsetWidth; // eslint-disable-line max-len
-        this.$el.style.left = `${dayPxOffset}px`;
-      }
+    },
+    checkDayMovementConstraint(slotDiff) {
+      const isWithinDayStart = this.setMomentBySlotDiff(this.entry.start, 0, slotDiff);
+      const isWithinDayEnd = this.setMomentBySlotDiff(this.entry.end, 0, slotDiff);
+      const isMidnight = isWithinDayEnd.hours() === 0 && isWithinDayEnd.minutes() === 0;
+      const isNextDay = isWithinDayEnd.date() === moment(this.entry.start).add(1, 'days').date();
+      const isNextDayAtMidnight = isNextDay && isMidnight;
+      return isWithinDayStart.date() === this.entry.start.date()
+        && (isWithinDayEnd.date() === this.entry.start.date() || isNextDayAtMidnight);
     },
     /**
      * gets hit day dom element from mouse event
@@ -176,9 +186,12 @@ export default {
         other.start.isBefore(end)
           && other.end.isAfter(start));
     },
-    setMomentBySlotDiff(baseTime, newDay, diff) {
-      const temp = moment(newDay).seconds(0).milliseconds(0);
-      temp.hours(baseTime.hours()).minutes(baseTime.minutes()).add(diff * 15, 'minutes');
+    setMomentBySlotDiff(baseTime, dayDiff, slotDiff) {
+      const temp = moment(baseTime).seconds(0).milliseconds(0);
+      temp.hours(baseTime.hours())
+        .minutes(baseTime.minutes())
+        .add(slotDiff * 15, 'minutes')
+        .add(dayDiff, 'days');
       return temp;
     },
   },
@@ -196,14 +209,16 @@ export default {
   z-index: 1;
   position: relative;
   left: 0;
-  transition: left 0.2s ease-in-out;
+}
+
+.entry {
+  --entry-color: $light-color;
 }
 
 .entry {
   box-sizing: border-box;
   border-radius: 2px;
-  background-color: $light-color;
-  border: 1px solid darken($light-color, 5%);
+  background-color: var(--entry-color);
   color: #fff;
   font-size: 0.6875rem;
   display: grid;
@@ -218,8 +233,8 @@ export default {
   box-shadow: $shadow;
 }
 
-.entry--moving {
-  cursor: move;
+.entry--overlapping {
+  --entry-color: $accent-color;
 }
 
 .entry__info {
