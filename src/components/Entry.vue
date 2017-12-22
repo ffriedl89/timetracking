@@ -1,8 +1,8 @@
 <template>
   <div class="entry-wrapper" ref="wrapper" :class="{'entry--dragging': dragging }" :style="styleObject" @mousedown="entryMouseDown">
     <div class="entry" :class="{'entry--overlapping': overlapping}">
-      <div class="entry__info">
-        {{newStart ? newStart.format('HH:mm:ss') : entry.start.format('HH:mm:ss')}} - {{newEnd ? newEnd.format('HH:mm:ss') : entry.end.format('HH:mm:ss')}}
+      <div class="entry__info" :title="entryContent">
+        {{entryContent}}
       </div>
       <div class="entry__handle" @mousedown="resizeMouseDown" ref="resizeHandle" >
       </div>
@@ -64,6 +64,11 @@ export default {
       return {
         'grid-row': `${this.rowStart} / ${this.rowEnd}`,
       };
+    },
+    entryContent() {
+      const start = this.newStart ? this.newStart.format('HH:mm:ss') : this.entry.start.format('HH:mm:ss');
+      const end = this.newEnd ? this.newEnd.format('HH:mm:ss') : this.entry.end.format('HH:mm:ss');
+      return `${start} - ${end}`;
     },
   },
   methods: {
@@ -237,6 +242,9 @@ export default {
 .entry__info {
   grid-row: 1;
   padding: 0.125rem 1rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .entry__handle {
