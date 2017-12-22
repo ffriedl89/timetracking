@@ -7,3 +7,7 @@ export const LOGOUT = 'LOGOUT';
 
 export const START_DRAG = 'START_DRAG';
 export const END_DRAG = 'END_DRAG';
+
+export const SET_CURRENT_WEEK = 'SET_CURRENT_WEEK';
+export const SET_CURRENT_STARTDATE = 'SET_CURRENT_STARTDATE';
+export const SET_CURRENT_ENDDATE = 'SET_CURRENT_ENDDATE';

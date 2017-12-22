@@ -27,7 +27,7 @@ export default {
   color: #D6EBF3;
   border-radius: 3px;
   border: 2px solid  $btnColor;
-  padding: .5rem 1rem;
+  padding: .2rem 0.5rem;
   font-size: 1rem;
   box-shadow: $shadow;
 }

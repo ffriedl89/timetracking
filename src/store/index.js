@@ -4,6 +4,7 @@ import entries from './modules/entries';
 import user from './modules/user';
 import dragdrop from './modules/dragdrop';
 import settings from './modules/settings';
+import week from './modules/week';
 
 Vue.use(Vuex);
 
@@ -13,5 +14,6 @@ export default new Vuex.Store({
     user,
     dragdrop,
     settings,
+    week,
   },
 });
