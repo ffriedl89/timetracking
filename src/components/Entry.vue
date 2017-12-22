@@ -132,7 +132,6 @@ export default {
         const tempStart = this.setMomentBySlotDiff(this.entry.start, dayDiff, slotDiff);
         const tempEnd = this.setMomentBySlotDiff(this.entry.end, dayDiff, slotDiff);
         if (this.newStart && this.newStart.date() !== tempStart.date()) {
-          console.log('fetching new Days', tempStart.date(), this.newStart.date());
           this.entriesForDayMoved = this.getEntriesForDayExceptSelf(tempStart);
         }
         this.overlapping = this.doesOverlap(tempStart, tempEnd);
